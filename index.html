@@ -288,6 +288,30 @@ body {
 .timer-btn.reset { background: var(--card); border: 1px solid var(--card-border); color: var(--text); }
 .timer-btn:active { opacity: 0.8; }
 
+/* Continuous mode toggle */
+.continuous-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 20px;
+  background: none;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.continuous-toggle.active {
+  border-color: var(--green);
+  color: var(--green);
+  background: #4ade8015;
+}
+.cont-icon { font-size: 10px; letter-spacing: -3px; }
+
 /* Bottom Action */
 .bottom-action {
   padding: 12px 16px;
@@ -452,6 +476,10 @@ body {
           <button class="timer-btn reset" id="btn-reset" onclick="resetTimer()">Reset</button>
           <button class="timer-btn start" id="btn-start" onclick="toggleTimer()">Start</button>
         </div>
+        <button class="continuous-toggle" id="btn-continuous" onclick="toggleContinuous()">
+          <span class="cont-icon" id="cont-icon">&#9654;&#9654;</span>
+          <span id="cont-label">Continuous</span>
+        </button>
       </div>
     </div>
     <div class="bottom-action">
@@ -1755,6 +1783,8 @@ let timerRunning = false;
 let favorites = JSON.parse(localStorage.getItem('improv-favorites') || '[]');
 let currentPromptPools = [];
 let audioCtx = null;
+let continuousMode = false;
+let wakeLock = null;
 
 // Apply saved favorites
 favorites.forEach(id => {
@@ -1771,6 +1801,7 @@ function showView(id) {
 
 function goHome() {
   stopTimer();
+  if (continuousMode) toggleContinuous();
   showView('view-home');
 }
 
@@ -1944,7 +1975,12 @@ function startTimer() {
     if (timerRemaining <= 0) {
       stopTimer();
       playChime();
-      display.classList.add('done');
+      if (continuousMode) {
+        display.classList.remove('running');
+        setTimeout(() => continuousAdvance(), 1500);
+      } else {
+        display.classList.add('done');
+      }
     }
   }, 100);
 }
@@ -1996,6 +2032,72 @@ function playChime() {
     osc.stop(t + 1.0);
   });
 }
+
+// ── Continuous Mode ────────────────────────────────────────
+
+function toggleContinuous() {
+  continuousMode = !continuousMode;
+  const btn = document.getElementById('btn-continuous');
+  const label = document.getElementById('cont-label');
+  if (continuousMode) {
+    btn.classList.add('active');
+    label.textContent = 'Continuous ON';
+    requestWakeLock();
+  } else {
+    btn.classList.remove('active');
+    label.textContent = 'Continuous';
+    releaseWakeLock();
+  }
+}
+
+function continuousAdvance() {
+  // Load new random exercise, keep timer duration, auto-start
+  const pool = [];
+  exercises.forEach(ex => {
+    pool.push(ex);
+    if (ex.favorite) { pool.push(ex); pool.push(ex); }
+  });
+  let pick;
+  let attempts = 0;
+  do {
+    pick = pool[Math.floor(Math.random() * pool.length)];
+    attempts++;
+  } while (pick === currentExercise && exercises.length > 1 && attempts < 20);
+
+  const savedDuration = timerDuration;
+  showExercise(pick);
+  // Restore the user's chosen duration (not the exercise default)
+  timerDuration = savedDuration;
+  timerRemaining = savedDuration;
+  updateTimerDisplay();
+  updatePresetButtons();
+  // Auto-start after a beat
+  setTimeout(() => startTimer(), 600);
+}
+
+// ── Wake Lock (keep screen on) ────────────────────────────
+
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+    } catch (e) {}
+  }
+}
+
+function releaseWakeLock() {
+  if (wakeLock) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+}
+
+// Re-acquire wake lock when page becomes visible again
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && continuousMode) {
+    requestWakeLock();
+  }
+});
 
 // ── Favorites View ─────────────────────────────────────────
 
