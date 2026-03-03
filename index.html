@@ -2058,27 +2058,10 @@ function toggleContinuous() {
 }
 
 function continuousAdvance() {
-  // Load new random exercise, keep timer duration, auto-start
-  const pool = [];
-  exercises.forEach(ex => {
-    pool.push(ex);
-    if (ex.favorite) { pool.push(ex); pool.push(ex); }
-  });
-  let pick;
-  let attempts = 0;
-  do {
-    pick = pool[Math.floor(Math.random() * pool.length)];
-    attempts++;
-  } while (pick === currentExercise && exercises.length > 1 && attempts < 20);
-
-  const savedDuration = timerDuration;
-  showExercise(pick);
-  // Restore the user's chosen duration (not the exercise default)
-  timerDuration = savedDuration;
-  timerRemaining = savedDuration;
+  // Same exercise, new prompt, restart timer
+  if (currentPromptPools.length > 0) newPrompt();
+  timerRemaining = timerDuration;
   updateTimerDisplay();
-  updatePresetButtons();
-  // Auto-start after a beat
   setTimeout(() => startTimer(), 600);
 }
 
