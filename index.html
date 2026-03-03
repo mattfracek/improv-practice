@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Improv">
+<meta name="theme-color" content="#0a0a12">
+<title>Improv Practice</title>
+<style>
+:root {
+  --bg: #0a0a12;
+  --card: #14141f;
+  --card-border: #1e1e2e;
+  --accent: #e94560;
+  --accent-dim: #e9456033;
+  --text: #e8e8ee;
+  --muted: #6b6b80;
+  --green: #4ade80;
+  --blue: #60a5fa;
+  --orange: #fb923c;
+  --purple: #a78bfa;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-user-select: none; user-select: none;
+}
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* Views */
+.view { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+.view.active { display: flex; }
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  min-height: 52px;
+  flex-shrink: 0;
+}
+.header h1 {
+  font-size: 17px;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+}
+.back-btn, .star-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.back-btn:active, .star-btn:active { background: var(--accent-dim); }
+.star-btn.favorited { color: #fbbf24; }
+.header-spacer { width: 44px; flex-shrink: 0; }
+
+/* Home View */
+#view-home { padding: 0 20px; }
+.home-title {
+  text-align: center;
+  padding: 40px 0 8px;
+}
+.home-title h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.home-title p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 4px;
+}
+.home-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 32px;
+}
+.home-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 20px;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s;
+  text-align: left;
+}
+.home-btn:active { transform: scale(0.97); }
+.home-btn .icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.home-btn .icon.red { background: var(--accent-dim); }
+.home-btn .icon.gold { background: #fbbf2433; color: #fbbf24; }
+.home-btn .icon.blue { background: #60a5fa33; }
+.home-btn .label-group { flex: 1; }
+.home-btn .sublabel {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.home-footer {
+  margin-top: auto;
+  padding: 20px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Exercise View */
+#view-exercise {
+  padding: 0 16px;
+}
+.exercise-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 20px;
+}
+.exercise-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge.source { background: #60a5fa22; color: var(--blue); }
+.badge.category { background: #a78bfa22; color: var(--purple); }
+.exercise-name {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+.exercise-instructions {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #c8c8d4;
+  margin-bottom: 20px;
+}
+.exercise-purpose {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+  padding: 12px 16px;
+  background: var(--card);
+  border-radius: 12px;
+  border-left: 3px solid var(--accent);
+  margin-bottom: 20px;
+}
+.exercise-purpose strong { color: var(--text); }
+
+/* Prompt Section */
+.prompt-section {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.prompt-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.prompt-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--orange);
+  min-height: 34px;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+.prompt-btn {
+  background: var(--orange);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+.prompt-btn:active { opacity: 0.8; }
+
+/* Timer Section */
+.timer-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.timer-display {
+  font-size: 72px;
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+  margin: 8px 0;
+  color: var(--text);
+  transition: color 0.3s;
+}
+.timer-display.running { color: var(--green); }
+.timer-display.done { color: var(--accent); }
+.timer-presets {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.preset-btn {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 48px;
+}
+.preset-btn:active, .preset-btn.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.timer-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.timer-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.timer-btn.start { background: var(--green); color: #000; }
+.timer-btn.stop { background: var(--accent); color: #fff; }
+.timer-btn.reset { background: var(--card); border: 1px solid var(--card-border); color: var(--text); }
+.timer-btn:active { opacity: 0.8; }
+
+/* Bottom Action */
+.bottom-action {
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+.next-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.next-btn:active { opacity: 0.85; }
+
+/* Browse View */
+#view-browse { padding: 0 16px; }
+.browse-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 20px;
+}
+.browse-category {
+  margin-bottom: 8px;
+}
+.browse-category-header {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  padding: 16px 0 8px;
+}
+.browse-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.browse-item:active { transform: scale(0.98); }
+.browse-item .name {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+}
+.browse-item .source-tag {
+  font-size: 10px;
+  color: var(--muted);
+}
+.browse-item .fav-indicator {
+  color: #fbbf24;
+  font-size: 14px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeIn 0.2s ease-out; }
+
+@keyframes promptPop {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.prompt-pop { animation: promptPop 0.15s ease-out; }
+
+/* Empty state */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+.empty-state p { font-size: 17px; margin-bottom: 8px; }
+.empty-hint { font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <div id="view-home" class="view active">
+    <div class="home-title">
+      <h1>Improv Practice</h1>
+      <p>63 exercises. No excuses.</p>
+    </div>
+    <div class="home-actions">
+      <button class="home-btn" onclick="randomExercise()">
+        <div class="icon red">&#9861;</div>
+        <div class="label-group">
+          Random Exercise
+          <div class="sublabel">Just hit go</div>
+        </div>
+      </button>
+      <button class="home-btn" onclick="showFavorites()">
+        <div class="icon gold">&#9733;</div>
+        <div class="label-group">
+          Favorites
+          <div class="sublabel" id="fav-count"></div>
+        </div>
+      </button>
+      <button class="home-btn" onclick="showBrowse()">
+        <div class="icon blue">&#9776;</div>
+        <div class="label-group">
+          Browse All
+          <div class="sublabel" id="exercise-count">63 exercises</div>
+        </div>
+      </button>
+    </div>
+    <div class="home-footer">
+      Your first thought is the right thought.<br>
+      Hesitation is the censor winning.
+    </div>
+  </div>
+
+  <!-- EXERCISE -->
+  <div id="view-exercise" class="view">
+    <div class="header">
+      <button class="back-btn" onclick="goHome()">&#8249;</button>
+      <h1 id="ex-header-title"></h1>
+      <button class="star-btn" id="ex-star" onclick="toggleFavorite()">&#9734;</button>
+    </div>
+    <div class="exercise-scroll" id="exercise-scroll">
+      <div class="exercise-meta">
+        <span class="badge source" id="ex-source"></span>
+        <span class="badge category" id="ex-category"></span>
+      </div>
+      <h2 class="exercise-name" id="ex-name"></h2>
+      <div class="exercise-instructions" id="ex-instructions"></div>
+      <div class="exercise-purpose" id="ex-purpose"></div>
+
+      <div class="prompt-section" id="prompt-section" style="display:none">
+        <div class="prompt-label" id="prompt-label">Prompt</div>
+        <div class="prompt-value" id="prompt-value"></div>
+        <button class="prompt-btn" onclick="newPrompt()">Next Prompt</button>
+      </div>
+
+      <div class="timer-section">
+        <div class="timer-presets" id="timer-presets">
+          <button class="preset-btn" onclick="setTimer(30)">0:30</button>
+          <button class="preset-btn selected" onclick="setTimer(60)">1:00</button>
+          <button class="preset-btn" onclick="setTimer(120)">2:00</button>
+          <button class="preset-btn" onclick="setTimer(300)">5:00</button>
+        </div>
+        <div class="timer-display" id="timer-display">1:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn reset" id="btn-reset" onclick="resetTimer()">Reset</button>
+          <button class="timer-btn start" id="btn-start" onclick="toggleTimer()">Start</button>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-action">
+      <button class="next-btn" onclick="randomExercise()">Next Random Exercise</button>
+    </div>
+  </div>
+
+  <!-- FAVORITES -->
+  <div id="view-favorites" class="view">
+    <div class="header">
+      <button class="back-btn" onclick="goHome()">&#8249;</button>
+      <h1>Favorites</h1>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="browse-list" id="favorites-list"></div>
+    <div class="empty-state" id="favorites-empty" style="display:none">
+      <p>No favorites yet.</p>
+      <p class="empty-hint">Tap the star on any exercise to add it here.</p>
+    </div>
+  </div>
+
+  <!-- BROWSE -->
+  <div id="view-browse" class="view">
+    <div class="header">
+      <button class="back-btn" onclick="goHome()">&#8249;</button>
+      <h1>All Exercises</h1>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="browse-list" id="browse-list"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Exercise Data (63 total) ──────────────────────────────
+
+const exercises = [
+
+  // ═══════════════════════════════════════════════════════════
+  // WARM-UPS
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'word-vomit',
+    name: 'Word Vomit',
+    category: 'Warm-up',
+    source: 'Johnstone / Impro',
+    instructions: 'Say one word out loud. Then the very first word that comes to mind. Then the next. Don\'t pause. Don\'t filter. Don\'t try to make sense or be clever. One word per second, as fast as possible. Speed is everything — the goal is to outrun the censor entirely. If you catch yourself thinking, go faster.',
+    purpose: '<strong>The universal warm-up.</strong> Johnstone says hesitation = censoring. The brain constructs the entire universe — it\'s impossible to be "stuck" for a word.',
+    duration: 120,
+    prompts: ['words'],
+    promptLabel: 'Starting Word',
+    warmup: true,
+    favorite: false
+  },
+  {
+    id: 'new-choice',
+    name: 'New Choice',
+    category: 'Warm-up',
+    source: 'Solo Practice',
+    instructions: 'Do a mundane activity (making coffee, getting dressed). Narrate what you\'re doing out loud. Every 10 seconds, say "New choice!" and replace whatever you just said with something completely different. Then "New choice!" again. Three replacements per beat, then move on.',
+    purpose: '<strong>Trains you to abandon ideas without grief.</strong> The censor\'s power comes from making you precious about your first idea. This teaches you there are infinite ideas.',
+    duration: 180,
+    prompts: [],
+    warmup: true,
+    favorite: false
+  },
+  {
+    id: 'sound-and-movement',
+    name: 'Sound and Movement',
+    category: 'Warm-up',
+    source: 'Solo Practice',
+    instructions: 'Stand up. Make a sound — any sound. Let the sound create a movement in your body. Hold it for 5 seconds. Then let the movement transform into a new sound, which transforms into a new movement. Chain 10 of these together without stopping.',
+    purpose: '<strong>Gets you out of your head and into your body.</strong> Johnstone\'s Mask work shows that the body leads and the mind follows — not the other way around.',
+    duration: 120,
+    prompts: [],
+    warmup: true,
+    favorite: false
+  },
+  {
+    id: 'gibberish-monolog',
+    name: 'Gibberish Monolog',
+    category: 'Warm-up',
+    source: 'Solo Practice',
+    instructions: 'Pick an emotion (use the prompt). Deliver a passionate 90-second monolog in complete gibberish. Commit fully. Gesture. Pace. Whisper. Shout. No real words allowed.',
+    purpose: '<strong>Strips away dependence on clever language.</strong> Forces you to commit to emotion and physicality, which is where truthful performance lives. Play it straight and the comedy handles itself.',
+    duration: 90,
+    prompts: ['emotions'],
+    promptLabel: 'Your Emotion',
+    warmup: true,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // THINKING (Napier)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'dada-monologue',
+    name: 'Dada Monologue',
+    category: 'Thinking',
+    source: 'Napier / Improvise',
+    instructions: 'Look at an object (or use the prompt) and start a monologue using that object\'s name. The key: try not to stay on any idea too long and make sense of nothing. Nonsensical, stream-of-consciousness talking. When you start to make sense, change it up.',
+    purpose: '<strong>Frees up random associations.</strong> Jogs your mind awake. Brings light, fun, absurd thoughts to associate with while improvising.',
+    duration: 120,
+    prompts: ['words'],
+    promptLabel: 'Starting Object',
+    warmup: true,
+    favorite: false
+  },
+  {
+    id: 'word-association',
+    name: 'Word Association',
+    category: 'Thinking',
+    source: 'Napier / Improvise',
+    instructions: 'See an object, say its name out loud, and WITHOUT PAUSING immediately begin to talk about it. Describe it, tell a story, share an experience. After about ten seconds, interrupt yourself by saying a new object and WITHOUT PAUSING start talking about the new one. Do at least ten objects. Advanced: come up with words off the top of your head.',
+    purpose: '<strong>Teaches you that you can literally talk about anything.</strong> The gap between the word and talking is where the censor lives.',
+    duration: 120,
+    prompts: ['words'],
+    promptLabel: 'Starting Word',
+    warmup: true,
+    favorite: true
+  },
+  {
+    id: 'gibberish-napier',
+    name: 'Gibberish Scene',
+    category: 'Thinking',
+    source: 'Napier / Improvise',
+    instructions: 'Speak in nonsensical, non-English babble. Once comfortable, choose a character with a particular point of view and speak a line of gibberish from that character\'s energy. Then respond in gibberish with a character who has very different energy. Now you\'re doing a gibberish scene.',
+    purpose: '<strong>Eliminates the importance we place on words.</strong> In gibberish, your emotional life awakens. You practice putting the HOW into your improvisation — how someone says something versus what they say.',
+    duration: 120,
+    prompts: ['characters', 'emotions'],
+    promptLabel: 'Character / Emotion',
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // KILLING THE CENSOR
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'expert-interview',
+    name: 'Expert Interview',
+    category: 'Killing the Censor',
+    source: 'Solo Practice / Truth in Comedy',
+    instructions: 'Pick a random topic (use the prompt). You are now the world\'s leading expert. Speak with total authority and zero hesitation for 2 minutes. No hedging. No "um." Start sentences before you know how they\'ll end. When 2 min feels easy, go to 5. Then start taking imaginary "audience questions" and answering without breaking character.',
+    purpose: '<strong>Kills the censor</strong> — you can\'t know enough, so the censor becomes irrelevant. Trains commitment — every sentence requires doubling down on what you just invented.',
+    duration: 120,
+    prompts: ['expertTopics'],
+    promptLabel: 'Your Expert Topic',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'automatic-writing',
+    name: 'Automatic Writing',
+    category: 'Killing the Censor',
+    source: 'Johnstone / Impro',
+    instructions: 'Open a blank page (paper or screen). Set a timer for 3 minutes. Write without stopping. The pen never leaves the paper. If you don\'t know what to write, write "I don\'t know what to write" until something comes. Do not reread. Do not edit. Do not cross out.',
+    purpose: '<strong>Trains the intellect to step aside.</strong> Schiller said "the intellect has withdrawn its watcher from the gates, and the ideas rush in pell-mell." If what you wrote doesn\'t surprise or slightly embarrass you, you were still censoring.',
+    duration: 180,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'first-thought-worst-thought',
+    name: 'First Thought, Worst Thought',
+    category: 'Killing the Censor',
+    source: 'Johnstone / Impro',
+    instructions: 'Pick a random object (or use the prompt). Say the first word it makes you think of. Then the first word THAT makes you think of. Chain 30 associations as fast as you can. Go with the first thing — especially if it seems stupid, psychotic, or obscene.',
+    purpose: '<strong>Overrides the three filters that kill ideas.</strong> Johnstone: the three fears are that ideas are psychotic, obscene, or unoriginal. "The best ideas are often psychotic."',
+    duration: 120,
+    prompts: ['words'],
+    promptLabel: 'Starting Object',
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // SPEED & SPECIFICITY
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'three-line-scenes',
+    name: 'Three-Line Scenes',
+    category: 'Speed & Specificity',
+    source: 'Truth in Comedy',
+    instructions: 'Play both characters. Line 1: establish who, where, or what\'s happening. Line 2: "yes, and" with new information. Line 3: find the game or heighten. Start a new scene immediately. Do 20 scenes in 10 minutes. Speed over perfection. Statements, not questions. Gifts, not requests.',
+    purpose: '<strong>Scene compression.</strong> Del Close drilled these relentlessly. "Get in there, get it done." Tim Kazurinski compared it to nuns drilling times tables.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'specificity-swap',
+    name: 'Specificity Swap',
+    category: 'Speed & Specificity',
+    source: 'Truth in Comedy',
+    instructions: 'Describe your current environment out loud for 60 seconds. Now do it again — but replace every generic word with a specific one. Not "chair" but "Herman Miller Aeron with the cracked armrest." Not "coffee" but "lukewarm Trader Joe\'s medium roast with too much oat milk."',
+    purpose: '<strong>Specifics connect; generalities are forgettable.</strong> Mike Myers never said "Pass the ketchup." It was always "Pass the Heinz." A Z-28, a Yugo, a BMW — each tells you about the character.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'initiation-machine',
+    name: 'Initiation Machine',
+    category: 'Speed & Specificity',
+    source: 'Truth in Comedy',
+    instructions: 'Generate 10 opening lines for scenes, rapid-fire, out loud. Each one must: make an assumption about who both characters are, establish where they are, and imply why today is different. Not "Hello." Not "What\'s that?" Statements, not questions.',
+    purpose: '<strong>"He who gives information is a gift-giver; he who asks questions is a thief."</strong> Example: "Guten morgen, Herr Doctor, your experiment is on the slab."',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // CHARACTER (Napier)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'solo-character-switches',
+    name: 'Solo Character Switches',
+    category: 'Character',
+    source: 'Napier / Improvise',
+    instructions: 'Put a chair in the middle of the room. Begin a character monologue. At the end of thirty seconds, WITHOUT ANY PAUSE AT ALL, switch to a completely different character. No pause — catch up with your own talking and throw yourself off guard. Can go for as long as you want. Vary characters: some standing, some sitting. Use the prompt for inspiration or make it up on the spot.',
+    purpose: '<strong>Stretches character skills along with fearlessly initiating scenes.</strong> Conditions you to establish a strong point of view and strong initiation quickly.',
+    duration: 120,
+    prompts: ['characters'],
+    promptLabel: 'Character Type',
+    warmup: false,
+    favorite: true
+  },
+  {
+    id: 'character-interview',
+    name: 'Character Interview',
+    category: 'Character',
+    source: 'Napier / Improvise',
+    instructions: 'Sit in a chair and launch into a character monologue for about a minute, then "take questions." Pull a question from the prompt and answer it as the character. The more you vary the questions, the more you practice stretching yourself.',
+    purpose: '<strong>Puts you on the spot as a character.</strong> The variety of questions forces you to handle any element in a scene.',
+    duration: 120,
+    prompts: ['characters', 'interviewQuestions'],
+    promptLabel: 'Character / Question',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'styles-and-genres',
+    name: 'Styles and Genres in a Hat',
+    category: 'Character',
+    source: 'Napier / Improvise',
+    instructions: 'Start a character monologue. Let it get on solid ground for about thirty seconds, then pull a style or genre from the prompt. Have your character immediately be affected by it. After simple styles feel comfortable, challenge yourself with specific authors and playwrights.',
+    purpose: '<strong>More tools as a scenic improviser.</strong> Raises your reference level, brings more theatricality and variety.',
+    duration: 120,
+    prompts: ['styles'],
+    promptLabel: 'Style / Genre',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'sound-to-dialogue',
+    name: 'Sound to Dialogue',
+    category: 'Character',
+    source: 'Napier / Improvise',
+    instructions: 'Stand and make a sound — any sound. Let that sound slide into a character\'s dialogue. Improvise for around ten seconds as that character, then make another sound and slide it into another character. Do this for about two minutes.',
+    purpose: '<strong>Stretches your voice and arrives at characters you didn\'t know were in you.</strong> Forces your brain and mouth to catch up with your initiation. Great way to train vocal initiation.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: true
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // PHYSICAL / SPACE (Napier)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'environment',
+    name: 'Environment',
+    category: 'Physical / Space',
+    source: 'Napier / Improvise',
+    instructions: 'Stand in the middle of a fairly empty room. Without thinking, reach out and grab an imaginary object. Don\'t preconceive what it is — let it inspire you the second your hand hits it. Use the object. Set it down and immediately imagine another object associated with the first. Continue until you\'ve created about ten objects. Then revisit all of them.',
+    purpose: '<strong>Great practice creating environments.</strong> By beginning with nothing but the act of reaching out, you learn to immediately come up with something.',
+    duration: 180,
+    prompts: ['objects'],
+    promptLabel: 'Starting Object',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'body-parts',
+    name: 'Body Parts',
+    category: 'Physical / Space',
+    source: 'Napier / Improvise',
+    instructions: 'Walk at random around a room. Think of a body part (use the prompt) and LEAD with that body part — give it presence and walk forward. After a bit, switch to a different body part. Keep going through every part you can think of. After doing it a couple times, bring each character to words: start talking in character.',
+    purpose: '<strong>When you lead with a body part, you feel differently.</strong> Gives you an instant character. Helps you make choices that wouldn\'t normally occur to you.',
+    duration: 180,
+    prompts: ['bodyParts'],
+    promptLabel: 'Lead With',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'breakfast',
+    name: 'Breakfast',
+    category: 'Physical / Space',
+    source: 'Napier / Improvise',
+    instructions: 'Lie down on the floor. Without words, create a character who wakes up, gets dressed, and gets ready for the day. Have each moment evolve. How does that character brush their teeth? What kind of clothes? Is the furniture new or old? After getting ready, have the character prepare and eat breakfast, paying attention to details. Then leave the house. Commit to each object\'s weight, texture, and use.',
+    purpose: '<strong>Character discovery through committing to a detailed environment.</strong> Using the location and objects within it as a tool to tell your character\'s story.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'object-monologue-napier',
+    name: 'Object Monologue',
+    category: 'Physical / Space',
+    source: 'Napier / Improvise',
+    instructions: 'Launch a character monologue. Every once in a while, glance at the prompt for a new object. Continue the monologue as you integrate the object into the scene — not so that you focus on it or talk about it, but rather that it is incidental or used to accentuate the content of the monologue.',
+    purpose: '<strong>Practice having the environment be incidental.</strong> A common mistake is merely talking about the object you\'re holding. The object should support the scene, not drive it.',
+    duration: 180,
+    prompts: ['objects'],
+    promptLabel: 'Object to Integrate',
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // SCENIC (Napier)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'scenes-solo-two-person',
+    name: 'Scenes (Solo Two-Person)',
+    category: 'Scenic',
+    source: 'Napier / Improvise',
+    instructions: 'Sit in a chair. At any point, launch into a dialogue with another character. Immediately respond as the second character and continue the scene. Make the two characters as distinct as possible. Time yourself — make yourself continue for at least thirty seconds. As you practice, increase the length.',
+    purpose: '<strong>Challenges you to keep two balls in the air at once.</strong> Forces you to know the world of truly being in the moment. Give each character a distinct point of view.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'scene-emotional-shift',
+    name: 'Scene with Emotional Shift',
+    category: 'Scenic',
+    source: 'Napier / Improvise',
+    instructions: 'Same as Solo Two-Person, but each character has a different emotional base (use the prompt). One might be angry, the other giddy. Practice playing extremes, as well as subdued expressions. Advanced: declare more gray states like jealousy, indifference, angst. Try a scene where both characters share the same emotion.',
+    purpose: '<strong>Stretches your emotional range while improvising.</strong> Most people stay within their comfort range with emotion — opening that up now brings great rewards later.',
+    duration: 120,
+    prompts: ['emotions'],
+    promptLabel: 'Emotional Base',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'scenes-status-shift',
+    name: 'Scenes of Status Shift',
+    category: 'Scenic',
+    source: 'Napier / Improvise',
+    instructions: 'Improvise a scene by yourself, shifting between high and low status. Start with a distinctly high-status character (use the prompt) and a distinctly low-status one. As you create more scenes, muddy the line until you create two characters with nearly the same status. Watch them vie for the upper hand.',
+    purpose: '<strong>Many scenes are about status.</strong> Either a character is trying to get more status, fighting to hold theirs, or lying about it. Status is often what the scene is actually about.',
+    duration: 120,
+    prompts: ['statusPairs'],
+    promptLabel: 'Status Pairing',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'heightening',
+    name: 'Heightening',
+    category: 'Scenic',
+    source: 'Napier / Improvise',
+    instructions: 'Stand. Start a scene with words. Do only one character\'s dialogue, heightening your own character\'s point of view. Pretend there is another character speaking gibberish. Constantly put fuel on your own fire, adding to and heightening the energy or point of view. Pause for the other improviser\'s "dialogue."',
+    purpose: '<strong>Helps you maintain and heighten your own thing.</strong> Sustains your ability to filter anything else through your character. Solo practice for keeping your own fire going.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: true
+  },
+  {
+    id: 'read-a-character',
+    name: 'Read a Character from a Play',
+    category: 'Scenic',
+    source: 'Napier / Improvise',
+    instructions: 'Read plays. Read a character out loud. Don\'t worry about the acting quality — just read it. Notice how the character\'s point of view heightens and flourishes and is unwavering. The playwright does this on purpose. In improv, you must create the point of view yourself.',
+    purpose: '<strong>Reading plays is how you get an edge in improvisation.</strong> "How can I get an edge?" — "Acting skills." Professional improv is often more sketch. You have to play roles. That\'s an acting job.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'film-dialogue',
+    name: 'Film Dialogue',
+    category: 'Scenic',
+    source: 'Napier / Improvise',
+    instructions: 'Turn on your TV. Turn off the sound. Find a movie. Improvise the characters\' dialogue. Forces you to keep going — you must keep talking as long as the film characters talk. At first, take only one character\'s dialogue, then work up to all characters for a half hour.',
+    purpose: '<strong>Fun and usually funny.</strong> Forces you to keep going. Notice how characters\' points of view remain intact and are heightened throughout.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // NARRATIVE & REINCORPORATION
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'solo-story',
+    name: 'Solo Story with Reincorporation',
+    category: 'Narrative',
+    source: 'Johnstone / Impro',
+    instructions: 'Tell an improvised story out loud for 3 minutes. No planning. Start with a character and a location. When you get stuck, do NOT invent something new — look back at what you\'ve already said and reincorporate an earlier element. Bring back at least 3 elements from the first minute by the end.',
+    purpose: '<strong>Connections beat jokes.</strong> Johnstone: "A story is not free association. It\'s free association + reincorporation." The improviser walks backwards — he sees where he\'s been, pays no attention to the future.',
+    duration: 180,
+    prompts: ['characters', 'locations'],
+    promptLabel: 'Character & Place',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'pattern-game',
+    name: 'Pattern Game (Solo)',
+    category: 'Narrative',
+    source: 'Truth in Comedy',
+    instructions: 'Say a word out loud (use the prompt). Free-associate from it — but listen to yourself. When a theme starts to emerge in your associations, follow it. Let the chain narrow from chaos to focus, then loop back to the original word.',
+    purpose: '<strong>Foundation of the Harold opening.</strong> "Connections cannot be avoided" if you\'re paying attention. Solo, this trains your ear to hear the patterns your own mind is producing.',
+    duration: 120,
+    prompts: ['words'],
+    promptLabel: 'Starting Word',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'conducted-story',
+    name: 'Conducted Story (Three Voices)',
+    category: 'Narrative',
+    source: 'Truth in Comedy',
+    instructions: 'Tell a story using three different character voices. Switch between them mid-sentence. Each voice picks up exactly where the last left off — same sentence, same thought. The story should sound continuous despite the voice changes.',
+    purpose: '<strong>"The only way to succeed is to listen and pay attention every step of the way."</strong> Switching voices forces you to stay in the moment because you can\'t plan ahead while tracking whose turn it is.',
+    duration: 180,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // STATUS & CHARACTER
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'status-walk',
+    name: 'Status Walk',
+    category: 'Status & Character',
+    source: 'Johnstone / Impro',
+    instructions: 'Walk around your house. For 2 minutes, walk in the highest status you can: still head, smooth movement, eye contact with everything, occupying space freely, unhurried. Then switch: 2 minutes of lowest status — jerky movement, eyes down, shrinking, apologetic. Then alternate every 30 seconds.',
+    purpose: '<strong>Status is something you DO, not something you ARE.</strong> Johnstone: "People specialize in playing high or low as a defense." Which is more comfortable? That\'s your default. Train the other one.',
+    duration: 240,
+    prompts: ['statusPairs'],
+    promptLabel: 'Status Pairing',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'status-to-objects',
+    name: 'Status to Objects',
+    category: 'Status & Character',
+    source: 'Johnstone / Impro',
+    instructions: 'Pick up three objects. Play high status to one (own it, command it, it exists for your pleasure). Play low status to the next (it intimidates you, you\'re not worthy, handle it gingerly). Play a status battle with the third — start high, let it win, then reclaim dominance.',
+    purpose: '<strong>"Status is played to everything — objects, furniture, space, not just people."</strong> (Johnstone)',
+    duration: 120,
+    prompts: ['objects'],
+    promptLabel: 'Object',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'secret',
+    name: 'Secret',
+    category: 'Status & Character',
+    source: 'Truth in Comedy',
+    instructions: 'Pick a secret or preoccupation (use the prompt). Now go do a mundane task — dishes, grocery shopping, folding laundry — while carrying this secret. Let it color everything you do and think without ever stating it directly.',
+    purpose: '<strong>"Responses are motivated by their characters\' preoccupations."</strong> Jim Carrane played bowling while secretly planning suicide — he wrote his note on the scorecard, said "It\'s just a game." The preoccupation drove everything.',
+    duration: 300,
+    prompts: ['secrets'],
+    promptLabel: 'Your Secret',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'character-point-of-view',
+    name: 'Character Point of View',
+    category: 'Status & Character',
+    source: 'Truth in Comedy',
+    instructions: 'Pick a strong worldview that is NOT yours (use the prompt). Go about 5 minutes of your day filtered through this lens. How does this person make coffee? React to a text message? What do they notice that you wouldn\'t?',
+    purpose: '<strong>"A real character consists of the actor himself, with any additional point of view, preoccupation, or attitude."</strong> This isn\'t about funny voices — it\'s about how a worldview shapes responses.',
+    duration: 300,
+    prompts: ['worldviews'],
+    promptLabel: 'Worldview',
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // ENVIRONMENT & PHYSICALITY
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'build-a-room',
+    name: 'Build a Room',
+    category: 'Environment',
+    source: 'Truth in Comedy',
+    instructions: 'Stand in an empty space. Build an entire room with mime, one object at a time. Place each object deliberately — feel its weight, texture, temperature. Open drawers. Sit in the chair. Pour from the bottle. Spend 3 minutes making the space real. Then navigate it without walking through anything you\'ve placed.',
+    purpose: '<strong>"Once the performers bring objects into existence, they are real."</strong> Breaking reality — walking through your own table — is one of the worst crimes in improv. This builds spatial memory and physical commitment.',
+    duration: 180,
+    prompts: ['locations'],
+    promptLabel: 'Room Type',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'object-monolog-solo',
+    name: 'Object Monolog',
+    category: 'Environment',
+    source: 'Truth in Comedy',
+    instructions: 'Pick up an imaginary object (use the prompt). Mime using it while talking about something completely unrelated. The activity and the dialog should be separate — but watch how the physical action starts to influence what you\'re saying.',
+    purpose: '<strong>"The verbal and visual levels must be kept separate, so they can connect later."</strong> A woman tearing lettuce while discussing a bad date — the violence of the action revealed her anger.',
+    duration: 120,
+    prompts: ['objects'],
+    promptLabel: 'Your Object',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'environment-affects-you',
+    name: 'Environment Affects You',
+    category: 'Environment',
+    source: 'Truth in Comedy',
+    instructions: 'Pick a location (use the prompt). Close your eyes. Visualize it — six sides. What do you hear? Smell? Feel? Now open your eyes and exist in that space for 2 minutes. Move through it. Let it affect your mood, posture, pace, and breathing.',
+    purpose: '<strong>"As soon as an actor begins to see his environment, the audience sees it through his eyes."</strong> Two students told to create a scene on a deserted highway immediately became dazed and invented a post-nuclear world — the space drove the scene.',
+    duration: 120,
+    prompts: ['locations'],
+    promptLabel: 'Your Location',
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // GAME & PATTERN
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'if-this-is-true',
+    name: 'If This Is True, What Else Is True?',
+    category: 'Game & Pattern',
+    source: 'UCB Manual',
+    instructions: 'State an unusual premise out loud: "A dentist who is terrified of teeth." Now heighten it — ask "If this is true, what else is true?" three times, each answer more absurd than the last. Stay in the same pattern. Don\'t introduce new unusual things.',
+    purpose: '<strong>The core of Game.</strong> "If this unusual thing is true, then what else is true?" Trains you to heighten within a pattern rather than scatter into randomness. If your game is 3, 6, 9 — the next move is 12, not 47.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'find-the-game',
+    name: 'Find the Game in Real Life',
+    category: 'Game & Pattern',
+    source: 'UCB Manual',
+    instructions: 'Watch a TV show, a conversation, or recall an interaction from your day. Identify the "game" — the pattern of behavior, the thing that kept repeating or escalating. What was the first unusual thing? How did it heighten?',
+    purpose: '<strong>"The Game lies in your scene partner, not in your head."</strong> Trains your pattern-recognition muscle using real material.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'connections-drill',
+    name: 'Connections Drill',
+    category: 'Game & Pattern',
+    source: 'Truth in Comedy',
+    instructions: 'Pick two completely unrelated things (use the prompt — hit it twice for two words). You have 60 seconds to find as many connections between them as possible. Say them out loud.',
+    purpose: '<strong>"The farther apart the topics, the more amazing when they finally connect."</strong> Like the legs of a teepee — far apart at the bottom, meeting at the top. This is the muscle that makes Harold endings land.',
+    duration: 60,
+    prompts: ['words'],
+    promptLabel: 'Connect These',
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // EMOTIONAL RANGE
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'emotional-replay',
+    name: 'Emotional Replay',
+    category: 'Emotional Range',
+    source: 'Solo Practice',
+    instructions: 'Pick a dead-simple activity: brushing your teeth, tying your shoes, pouring water. Do it once normally. Now repeat the exact same activity five times, each time with a completely different emotion (use the prompt for each). Commit 100%. Don\'t half-ass the emotion and don\'t change the activity.',
+    purpose: '<strong>The audience doesn\'t need you to do something different. They need you to do the same thing while feeling something different.</strong> This is how subtext works — the gap between what you\'re doing and what you\'re feeling IS the scene.',
+    duration: 180,
+    prompts: ['emotions'],
+    promptLabel: 'This Round\'s Emotion',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'emotion-switch',
+    name: 'Emotion Switch',
+    category: 'Emotional Range',
+    source: 'Solo Practice',
+    instructions: 'Deliver a monolog about anything — your day, a made-up story, a rant about parking. Every 20 seconds, switch to the opposite emotion without changing the subject. Happy to furious. Calm to panicked. The switch must be instant — no transition, no explanation.',
+    purpose: '<strong>Emotional agility matters more than emotional depth.</strong> You need to turn on a dime when your scene partner takes things somewhere unexpected. This builds the reflex of committing fully to a new emotional reality the instant it arrives.',
+    duration: 120,
+    prompts: ['emotions'],
+    promptLabel: 'Starting Emotion',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'vulnerability-monolog',
+    name: 'Vulnerability Monolog',
+    category: 'Emotional Range',
+    source: 'Solo Practice',
+    instructions: 'Set a timer for 2 minutes. Talk about something real — something you actually feel, something that actually happened, something that actually scares you. Not a bit. Not a character. You. Speak it plainly with no performance.',
+    purpose: '<strong>Del Close said nothing is funnier than the truth.</strong> Most improvisers hide behind cleverness because truth feels exposed. The best performers are the ones willing to be genuinely human. The improv stage rewards honesty the way almost nowhere else in life does.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // LISTENING & REACTION
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'yes-and-the-world',
+    name: 'Yes And the World',
+    category: 'Listening & Reaction',
+    source: 'Solo Practice',
+    instructions: 'Go for a walk or do errands. Internally (or out loud if alone) Yes And everything you encounter. A dog walks by: "Yes, and that dog is clearly the mayor of this block." A car honks: "Yes, and that\'s the third warning." Someone drops something: "Yes, and that\'s the moment his whole plan fell apart."',
+    purpose: '<strong>Turns your entire day into scene work.</strong> Trains the Yes And reflex so deeply that it becomes your default response to stimuli, not something you have to consciously activate on stage.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'podcast-scene-partner',
+    name: 'Podcast Scene Partner',
+    category: 'Listening & Reaction',
+    source: 'Solo Practice',
+    instructions: 'Listen to a podcast or interview. Pause after someone makes a statement. Respond out loud as if you\'re in a scene with them — Yes And their reality, add information, make it about the relationship. Then unpause and hear what they actually said.',
+    purpose: '<strong>Gives you a genuine, unpredictable stimulus to respond to.</strong> Trains you to listen for the whole idea before responding. The gap between your instinct and theirs is where you learn.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'eavesdrop-and-heighten',
+    name: 'Eavesdrop and Heighten',
+    category: 'Listening & Reaction',
+    source: 'Solo Practice',
+    instructions: 'In a public place (coffee shop, park, waiting room), listen to a real conversation. Identify the "game" — the pattern, the dynamic, the unusual thing. Then mentally heighten it three beats. Where would this go if it were a scene? What\'s the third beat?',
+    purpose: '<strong>Real human interaction is the richest source material.</strong> This trains pattern recognition on actual people being actual people.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // SOLO SCENE WORK
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'play-both-characters',
+    name: 'Play Both Characters',
+    category: 'Solo Scene Work',
+    source: 'Solo Practice',
+    instructions: 'Do a full 2-minute scene playing both characters. Physically shift position when you switch — even just turning your head or shifting weight. Give each character a distinct point of view, not just a distinct voice. Let the scene change both of them.',
+    purpose: '<strong>The closest thing to actual scene work you can do alone.</strong> The challenge isn\'t playing two characters — it\'s LISTENING to yourself as the other character and responding honestly. If you know where the scene is going after the first exchange, you\'re writing, not improvising.',
+    duration: 120,
+    prompts: ['characters', 'locations'],
+    promptLabel: 'Characters & Place',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'last-line-first-line',
+    name: 'Last Line / First Line',
+    category: 'Solo Scene Work',
+    source: 'Solo Practice',
+    instructions: 'Do a three-line scene. The last line of that scene becomes the first line of a completely new scene — different characters, different location, different context. Chain five scenes together this way.',
+    purpose: '<strong>Trains you to take any offer and transform it.</strong> "Yes, we\'re now legally divorced" becomes a line about a business partnership splitting up, or a kid dividing candy. Same words, completely different scene.',
+    duration: 180,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'solo-harold-beat',
+    name: 'Solo Harold Beat',
+    category: 'Solo Scene Work',
+    source: 'Solo Practice',
+    instructions: 'Pick a random word (use the prompt). Do a 60-second monolog inspired by it (real, personal, truthful). From that monolog, pull out three completely different scene premises. Do the first beat of each as a three-line scene. Then find the connections between them.',
+    purpose: '<strong>The Harold muscle.</strong> Extracting multiple angles from one seed, then discovering connections you didn\'t consciously create. Your subconscious is already making connections your conscious mind hasn\'t noticed yet.',
+    duration: 300,
+    prompts: ['words'],
+    promptLabel: 'Seed Word',
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // BODY & VOICE
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'physical-lead',
+    name: 'Physical Lead',
+    category: 'Body & Voice',
+    source: 'Solo Practice',
+    instructions: 'Pick a body part (use the prompt). Let that body part lead as you walk around the room. Don\'t decide who this person is — let the walk tell you. After 30 seconds, start speaking as this character. What do they talk about? How do they feel? Switch body parts every minute.',
+    purpose: '<strong>Character lives in the body first.</strong> Johnstone\'s Mask work and Chaplin\'s Tramp both came from the physical. A chin-forward walk creates a completely different human than a chest-forward walk. This bypasses the censor entirely.',
+    duration: 180,
+    prompts: ['bodyParts'],
+    promptLabel: 'Lead With',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'mirror-characters',
+    name: 'Mirror Characters',
+    category: 'Body & Voice',
+    source: 'Solo Practice',
+    instructions: 'Stand in front of a mirror. Make a face — any face. Hold it. Let the face tell you who this person is. What\'s their name? What just happened to them? What do they want? Speak as them for 30 seconds. Then wipe the face, make a new one, repeat. Five characters in five minutes.',
+    purpose: '<strong>Johnstone\'s Mask work: "A good Mask gives you the feeling you already know the creature in the mirror."</strong> Your own face, committed to fully, does the same thing. The character comes from the outside in.',
+    duration: 300,
+    prompts: ['characters'],
+    promptLabel: 'Character Inspiration',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'freestyle-verse',
+    name: 'Freestyle Verse',
+    category: 'Body & Voice',
+    source: 'Solo Practice',
+    instructions: 'Pick any topic (use the prompt). Speak about it in rhyming verse for 90 seconds. Don\'t stop to find the perfect rhyme — accept the bad ones, the forced ones, the ones that take you somewhere bizarre. Level up: do it as a specific character.',
+    purpose: '<strong>"Abandon control. Let the rhyme dictate content and action."</strong> (Johnstone) Rhyme forces you to give up your agenda. The next line is determined by the sound, not what you "want" to say. The purest censor-killer.',
+    duration: 90,
+    prompts: ['words'],
+    promptLabel: 'Your Topic',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'slow-motion-fight',
+    name: 'Slow Motion Fight',
+    category: 'Body & Voice',
+    source: 'Solo Practice',
+    instructions: 'Choreograph a slow-motion fight with an invisible opponent. Every punch, dodge, and reaction should be fully committed and physically detailed. Facial expressions matter. Take a full 5 seconds per move. Let the fight tell a story — who is winning? When does it turn? How does it end?',
+    purpose: '<strong>Builds physical commitment and mime precision.</strong> Also trains the discovery principle — you don\'t decide who wins at the start. You let the fight unfold and discover the narrative through the action.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // OBSERVATION & TRUTH
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'people-study',
+    name: 'People Study',
+    category: 'Observation & Truth',
+    source: 'Solo Practice',
+    instructions: 'Observe a stranger (discreetly) for 60 seconds. Note everything: posture, pace, clothing, how they hold their phone. Now narrate their internal monolog. Not comedy — truth. What are they actually thinking? What are they worried about? What did they just come from?',
+    purpose: '<strong>The best improv characters aren\'t invented — they\'re observed.</strong> Stocks your unconscious with real human behavior so that when you step on stage, you\'re drawing from life, not from sitcoms.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'gratitude-riff',
+    name: 'Gratitude Riff',
+    category: 'Observation & Truth',
+    source: 'Solo Practice',
+    instructions: 'Pick an ordinary object (use the prompt). Speak for 60 seconds about why it\'s extraordinary. Not ironic, not a bit — find genuine reasons. The engineering behind it, the hands that made it, what life would be without it.',
+    purpose: '<strong>Finds the interesting in the mundane.</strong> Truth in Comedy: "Take a topic as trivial as \'wet cardboard\' and discover the meaning of life while exploring it."',
+    duration: 60,
+    prompts: ['objects'],
+    promptLabel: 'Your Object',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'honest-recall',
+    name: 'Honest Recall',
+    category: 'Observation & Truth',
+    source: 'Solo Practice',
+    instructions: 'Close your eyes. Pick a specific moment from your life — not a story, a single moment. Where were you standing? What was the light like? What could you hear? What did you feel in your body? Describe it out loud in present tense for 2 minutes. Stay in the moment. Don\'t narrate forward or backward.',
+    purpose: '<strong>"Players must remember, not invent. Audiences relate to someone telling the truth."</strong> Trains the sense memory recall that makes monologs land. The foundation of vulnerability that makes audiences lean in.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // BONUS (Napier)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 'write-improvised-scene',
+    name: 'Write an Improvised Scene',
+    category: 'Bonus',
+    source: 'Napier / Improvise',
+    instructions: 'Sit at your computer. Write a two-person scene in real time. Get a timer — five minutes. Never ever stop typing. Do not censor yourself or self-edit or worry about punctuation or spelling. Name characters A and B. You should hit between three quarters of a page to a page and a half. Do not worry if the scene is bad or doesn\'t make sense.',
+    purpose: '<strong>A writing exercise as much as an improv exercise.</strong> If you truly do this without corrections and without stopping, your mind and words will go places that normally wouldn\'t occur to you.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: true
+  },
+  {
+    id: 'songs',
+    name: 'Songs',
+    category: 'Bonus',
+    source: 'Napier / Improvise',
+    instructions: 'While at home or strolling down the street, improvise a song. Just start singing. You will discover the melody and what the song is about all at the same time. Rhyme or not, but over time learn to rhyme. Practice not commenting on a bad rhyme — just keep in it.',
+    purpose: '<strong>If you keep improvising, you will have to improvise a song.</strong> You can either maintain the conversation that you\'re not a good singer, or you can start learning today.',
+    duration: 120,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'counting-to-one-hundred',
+    name: 'Counting to One Hundred',
+    category: 'Bonus',
+    source: 'Napier / Improvise',
+    instructions: 'Stand in the middle of a room. Pretend you\'re a great speaker and five thousand people have gathered to hear you. Instead of words, use numbers. Start counting out loud, pretending the numbers are a great speech. Provide variety — sometimes questions, other times declarations. Use emotional variety. Know you\'re coming to the end around count ninety, and use the last ten for closure.',
+    purpose: '<strong>Hones general performing skills</strong> by letting you play with commitment, emotion, and variety without the burden of thinking of words. Also drills finding importance in what you say.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'dance',
+    name: 'Dance',
+    category: 'Bonus',
+    source: 'Napier / Improvise',
+    instructions: 'Turn on some music you like and dance. That\'s all. And really commit to it. Don\'t make fun of or comment on the fact you are dancing. Really dance.',
+    purpose: '<strong>Most improvisers are not in touch with their bodies, especially men.</strong> You can tell a lot about how improvisers improvise by how they dance. If you can get comfortable with seriously dancing, you\'ll overcome a lot of fear and give yourself permission to be a physical being in a scene.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'notes-on-good-acting',
+    name: 'Notes on Good Acting',
+    category: 'Bonus',
+    source: 'Napier / Improvise',
+    instructions: 'Choose a good film with good acting, one you\'ve seen before. Choose a lead actor. Watch with only that actor\'s acting in mind. Take notes on what makes it good. Write down what surprises you: the builds in dialogue, why they paused, and so on. Do this with two or three films and compare your notes.',
+    purpose: '<strong>Studying what people do when they act well adds more tools.</strong> Academically identifying what\'s effective helps you own those techniques. Watch a film you\'ve already seen to focus on scrutiny, not story.',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'non-fiction-summary',
+    name: 'Non-Fiction Summary',
+    category: 'Bonus',
+    source: 'Napier / Improvise',
+    instructions: 'Read a piece of nonfiction, a chapter or so (or use the prompt for a topic you already know). Then, as a character, summarize the concept to an imaginary person. Don\'t think ahead — just put the book down and start talking. As a character, TEACH an imaginary person the subject matter.',
+    purpose: '<strong>Improving your reference level and mind.</strong> You\'re learning to incorporate that reference level into improvisation by weaving it into a character monologue. You\'re remembering ideas by describing them out loud.',
+    duration: 180,
+    prompts: ['nonfictionTopics'],
+    promptLabel: 'Topic to Teach',
+    warmup: false,
+    favorite: false
+  },
+  {
+    id: 'exercise',
+    name: 'Exercise',
+    category: 'Bonus',
+    source: 'Napier / Improvise',
+    instructions: 'Exercise.',
+    purpose: '<strong>You don\'t have to be a bloated, pasty, pale, liquor-soaked viscous jelly blob.</strong>',
+    duration: 300,
+    prompts: [],
+    warmup: false,
+    favorite: false
+  }
+];
+
+// ── Prompt Pools ───────────────────────────────────────────
+
+const prompts = {
+  expertTopics: [
+    'Competitive yawning', 'Emotional furniture', 'Viking dentistry', 'Snail psychology',
+    'Haunted vegetables', 'Underground cheese markets', 'Whale opera', 'Time-traveling plumbers',
+    'Penguin law enforcement', 'Invisible architecture', 'Extreme ironing', 'Cloud farming',
+    'Dinosaur fashion', 'Quantum cooking', 'Sentient mailboxes', 'Medieval WiFi',
+    'Competitive sleeping', 'Ghost diplomacy', 'Underwater basket weaving', 'Alien pottery',
+    'Professional apologizing', 'Volcanic pastry arts', 'Telepathic gardening', 'Moon real estate',
+    'Ant motivational speaking', 'Prehistoric dentistry', 'Robot couples therapy',
+    'Intergalactic plumbing', 'Dream archaeology', 'Octopus accounting',
+    'Conspiracy theories about socks', 'The psychology of doors', 'Fog sculpting',
+    'Ancient astronaut cooking shows', 'Competitive staring', 'Mushroom politics',
+    'The history of nothing', 'Gravity repair', 'Professional line-standing',
+    'Emotional support furniture', 'How mirrors really work', 'The economy of imaginary friends',
+    'Reverse zoology', 'Haunted office supplies', 'The mating habits of traffic cones',
+    'Philosophical implications of toast', 'Competitive cloud watching', 'Underwater real estate law',
+    'Ghost nutrition', 'The aerodynamics of sandwiches', 'Emotional intelligence of rocks',
+    'Time travel etiquette', 'The secret lives of parking meters', 'Artisanal gravity',
+    'Interdimensional customer service', 'The politics of imaginary countries',
+    'Advanced theoretical napping', 'Pirate economics', 'Existential weather forecasting',
+    'Dinosaur relationship counseling', 'The sociology of waiting rooms',
+    'Paranormal plumbing', 'Quantum pet grooming', 'Medieval space exploration',
+    'Professional sword swallowing safety regulations', 'The history of invisible ink',
+    'Alien immigration policy', 'Sentient furniture rights', 'The mathematics of loneliness',
+    'Competitive whispering', 'Psychic accounting', 'The archaeology of bad decisions',
+    'Toddler geopolitics', 'Therapeutic volcano management', 'The economics of dreams',
+    'Ghost architecture', 'Interspecies diplomacy', 'The philosophy of elevator music',
+    'Competitive origami', 'The psychology of left turns', 'Ancient astronaut cuisine',
+    'Paranormal HR departments', 'The science of awkward silences',
+    'Zombie urban planning', 'Professional tree whispering', 'The history of imaginary numbers come to life',
+    'Emotional support robots', 'Deep sea motivational speaking', 'The art of professional apologizing',
+    'Cosmic janitor services', 'Haunted food trucks', 'The ethics of mind reading',
+    'Competitive meditation', 'Victorian internet culture', 'Penguin criminal justice',
+    'The spirituality of parking', 'Subterranean fashion week', 'Astral projection insurance',
+    'Dolphin corporate culture', 'The archaeology of regret', 'Competitive eyebrow raising',
+    'Ghost marriage counseling', 'The biomechanics of overthinking'
+  ],
+  words: [
+    'Telescope', 'Cinnamon', 'Thunder', 'Ladder', 'Whistle', 'Candle', 'Hammock', 'Glacier',
+    'Trumpet', 'Skeleton', 'Volcano', 'Blanket', 'Cathedral', 'Scissors', 'Avalanche',
+    'Doorknob', 'Lightning', 'Compass', 'Feather', 'Submarine', 'Lantern', 'Fossil',
+    'Parachute', 'Anchor', 'Marble', 'Chimney', 'Sandcastle', 'Firework',
+    'Typewriter', 'Windmill', 'Mushroom', 'Shipwreck', 'Hourglass', 'Cobweb', 'Antler',
+    'Suitcase', 'Fountain', 'Railroad', 'Zipper', 'Cocoon', 'Scarecrow', 'Dynamite',
+    'Kaleidoscope', 'Pendulum', 'Cactus', 'Labyrinth', 'Gargoyle', 'Keyhole', 'Trapeze',
+    'Wheelbarrow', 'Accordion', 'Periscope', 'Sundial', 'Boomerang', 'Rocking chair',
+    'Treehouse', 'Lighthouse', 'Drawbridge', 'Saxophone', 'Pocketknife', 'Chandelier',
+    'Thimble', 'Banjo', 'Trampoline', 'Stethoscope', 'Monocle', 'Tombstone',
+    'Carousel', 'Metronome', 'Crowbar', 'Origami', 'Cauldron', 'Birdcage',
+    'Oxygen', 'Tambourine', 'Passport', 'Corkscrew', 'Puppet', 'Thermos',
+    'Chandelier', 'Chalkboard', 'Spatula', 'Turnstile', 'Microscope', 'Gavel',
+    'Shoelace', 'Piggybank', 'Flute', 'Padlock', 'Napkin', 'Pebble',
+    'Constellation', 'Icicle', 'Hubcap', 'Curtain', 'Stapler', 'Vase',
+    'Blueprint', 'Canteen', 'Domino', 'Flyswatter', 'Pinecone', 'Spyglass',
+    'Harmonica', 'Stopwatch', 'Barnacle', 'Wrench', 'Bellows', 'Prism',
+    'Roulette wheel', 'Taxicab', 'Weathervane', 'Trombone', 'Seashell',
+    'Crutch', 'Ribbon', 'Anvil', 'Inkwell', 'Abacus', 'Fishbone',
+    'Knapsack', 'Drainpipe', 'Horseshoe', 'Tassel', 'Pitchfork'
+  ],
+  characters: [
+    'Nervous accountant', 'Retired astronaut', 'Russian dancer', 'Eccentric librarian',
+    'Paranoid dentist', 'Overconfident intern', 'Tired superhero', 'Nostalgic pirate',
+    'Anxious wedding planner', 'Overly enthusiastic park ranger', 'Bitter fortune teller',
+    'Melodramatic chef', 'Confused time traveler', 'Stoic lumberjack', 'Chatty mortician',
+    'Skeptical yoga instructor', 'Hyperactive museum guide', 'Disappointed magician',
+    'Flirtatious librarian', 'Germaphobic plumber', 'Philosophical taxi driver',
+    'Competitive kindergarten teacher', 'Lonely lighthouse keeper', 'Dramatic weatherman',
+    'Secretly evil florist', 'Zen demolition worker', 'Homesick alien', 'Uptight surfer',
+    'Grumpy fairy godmother', 'Romantic IRS auditor', 'Retired prizefighter',
+    'Obsessive bird watcher', 'Self-help guru having a breakdown', 'Off-duty clown',
+    'Conspiracy theorist barista', 'Opera singer at the DMV', 'Apologetic bouncer',
+    'Recently divorced wedding DJ', 'Overqualified fast food manager', 'Timid lion tamer',
+    'Smug crossing guard', 'Burned-out life coach', 'Aggressively optimistic oncologist',
+    'Former child star working at a car wash', 'Haunted antique dealer', 'Sleepy surgeon',
+    'Know-it-all kindergartner', 'Existential crisis flight attendant',
+    'Passive-aggressive driving instructor', 'Lonely billionaire', 'Retired con artist going straight',
+    'Emotionally fragile drill sergeant', 'Agoraphobic travel agent',
+    'Absurdly calm bomb defuser', 'Sentimental butcher', 'Compulsively honest politician',
+    'Claustrophobic elevator operator', 'Narcoleptic security guard',
+    'Oversharing dentist', 'Perfectionist janitor', 'Wistful robot',
+    'Angry crossing guard', 'Sarcastic hospice nurse', 'Retired spy living in suburbs',
+    'Manic dog walker', 'Delusional inventor', 'Suspiciously cheerful landlord',
+    'Jaded Santa Claus', 'Pompous food truck owner', 'Reformed pickpocket',
+    'Homesick diplomat', 'Bored immortal', 'Overly literal genie',
+    'Stubborn lighthouse keeper', 'Undercover cop at a yoga retreat',
+    'Nearsighted lifeguard', 'Vegan butcher', 'Recently fired news anchor',
+    'Method actor who won\'t break character', 'Former astronaut turned Uber driver',
+    'Guilt-ridden inheritance heir', 'Retired stuntwoman with a limp',
+    'Obsessive cartographer', 'Gentle bounty hunter', 'Paranoid beekeeper',
+    'Aspiring minimalist hoarder', 'Widowed sword swallower',
+    'Cheerful DMV worker', 'Runaway bride still in the dress',
+    'Former cult leader turned life coach', 'Shy auctioneer',
+    'Angry pacifist', 'Clumsy surgeon', 'Nostalgic demolition expert',
+    'Retired circus performer in an office job', 'Philosophically conflicted hitman',
+    'Hypochondriac nurse', 'Aggressively helpful neighbor'
+  ],
+  emotions: [
+    'Furious', 'Ecstatic', 'Heartbroken', 'Suspicious', 'Giddy', 'Melancholic',
+    'Paranoid', 'Falling in love', 'Disgusted', 'Awestruck', 'Jealous', 'Triumphant',
+    'Terrified', 'Blissful', 'Seething', 'Nostalgic', 'Panicked', 'Serene',
+    'Indignant', 'Manic', 'Defeated', 'Fascinated', 'Contemptuous', 'Euphoric',
+    'Devastated', 'Bewildered', 'Vengeful', 'Grateful', 'Bored to tears', 'Overwhelmed with joy',
+    'Wistful', 'Smug', 'Rebellious', 'Tender', 'Hysterical', 'Resigned',
+    'Defiant', 'Sheepish', 'Resentful', 'Delirious', 'Righteous', 'Homesick',
+    'Petty', 'Exasperated', 'Lovestruck', 'Bitter', 'Dumbfounded', 'Cocky',
+    'Mortified', 'Reverent', 'Unhinged', 'Bashful', 'Ravenous', 'Forlorn',
+    'Tickled pink', 'Volcanic rage', 'Quiet desperation', 'Childlike wonder',
+    'Barely contained excitement', 'Gut-wrenching guilt', 'Peaceful acceptance',
+    'White-hot jealousy', 'Exhausted relief', 'Simmering contempt',
+    'Irrational hope', 'Stunned disbelief', 'Grim determination',
+    'Inappropriate giddiness', 'Creeping dread', 'Fierce protectiveness',
+    'Drunk on power', 'Soul-deep loneliness', 'Reckless abandon', 'Holy awe'
+  ],
+  locations: [
+    'Dentist\'s waiting room', 'Edge of a cliff', 'Childhood bedroom', 'Church at midnight',
+    'Stuck elevator', 'Rooftop at sunset', 'Abandoned amusement park', 'Crowded subway car',
+    'Hospital cafeteria', 'Desert gas station', 'Castle dungeon', 'Space station',
+    'Laundromat at 2 AM', 'Fancy restaurant kitchen', 'School bus', 'Fishing boat in a storm',
+    'Backstage before a show', 'Prison visiting room', 'Tropical island', 'Used car lot',
+    'Library basement', 'Airport baggage claim', 'Haunted house', 'Top of a Ferris wheel',
+    'Dive bar at closing time', 'Empty swimming pool', 'Moving truck', 'Lighthouse in fog',
+    'Subway tunnel', 'Treehouse', 'Principal\'s office', 'Gondola over the Alps',
+    'Operating room', 'Funeral home after hours', 'Cramped studio apartment',
+    'Campfire in the woods', 'Hotel lobby at 3 AM', 'Construction site at dawn',
+    'Jury deliberation room', 'Abandoned warehouse', 'Kindergarten classroom',
+    'Confessional booth', 'Bowling alley', 'Dressing room before opening night',
+    'Dog park at sunset', 'Attic of your grandparents\' house', 'Taxi in rush hour',
+    'Cruise ship deck in a storm', 'Bomb shelter', 'Pawn shop',
+    'Ice cream truck on the last day of summer', 'Waiting room at a therapist\'s office',
+    'Parking garage stairwell', 'Bus stop in the rain', 'Cabin in a blizzard',
+    'Rooftop garden', 'Tollbooth', 'Sauna', 'Empty church on a Tuesday',
+    'Drive-in movie theater', 'Fire escape at a party', 'Wine cellar',
+    'The back seat of a cop car', 'Playground at night', 'Veterinarian\'s waiting room',
+    'Train platform after the last train left'
+  ],
+  objects: [
+    'Torch', 'Wine bottle', 'Old trunk', 'Rubber duck', 'Magnifying glass', 'Pocket watch',
+    'Snow globe', 'Typewriter', 'Rotary phone', 'Sword', 'Teddy bear', 'Crystal ball',
+    'Telescope', 'Music box', 'Leather journal', 'Walking cane', 'Top hat', 'Compass',
+    'Candelabra', 'Hourglass', 'Paintbrush', 'Chess piece', 'Fishing rod', 'Guitar',
+    'Stethoscope', 'Globe', 'Skeleton key', 'Feather quill', 'Binoculars', 'Lantern',
+    'Ship in a bottle', 'Gramophone', 'Ballet slippers', 'Boxing gloves', 'Microscope',
+    'Ventriloquist dummy', 'Broken umbrella', 'Bowling trophy', 'Sewing machine',
+    'Old radio', 'Whiskey flask', 'Croquet mallet', 'Surgeon\'s mask', 'Tambourine',
+    'Magnifying glass', 'Clay pot', 'Dog leash', 'Tape measure', 'Paint roller',
+    'Watering can', 'Leather belt', 'Cuckoo clock', 'Megaphone', 'Mortar and pestle',
+    'Velvet curtain', 'Broom', 'Tuning fork', 'Accordion', 'Cast iron skillet',
+    'Locket', 'Cigar box', 'Wreath', 'Thermometer', 'Paper fan', 'Metronome',
+    'Bellhop cart', 'Prayer beads', 'Spyglass', 'Oil lamp', 'Serving tray',
+    'Nutcracker', 'Riding crop', 'Deck of cards', 'Kaleidoscope', 'Wind chime',
+    'Jump rope', 'Monocle', 'Sextant', 'Pocket mirror', 'Antique key',
+    'Hand grenade', 'Wedding ring', 'Baby shoe', 'Switchblade', 'Rosary',
+    'Snow globe with a crack in it', 'Music box that plays the wrong song',
+    'Crown', 'Noose', 'Torch that won\'t light', 'Love letter from someone you forgot'
+  ],
+  bodyParts: [
+    'Nose', 'Chin', 'Left knee', 'Right shoulder', 'Pelvis', 'Forehead', 'Chest',
+    'Left elbow', 'Right hip', 'Belly button', 'Top of head', 'Lower back',
+    'Right ankle', 'Left wrist', 'Sternum', 'One ear', 'Tailbone'
+  ],
+  interviewQuestions: [
+    'Where are you from?', 'What\'s your favorite ice cream and why?',
+    'What is a sad moment in your childhood?', 'What do you do for a living?',
+    'What\'s your biggest regret?', 'Who is the love of your life?',
+    'What are you most afraid of?', 'What makes you laugh?',
+    'What do you do when nobody\'s watching?', 'What would you change about yourself?',
+    'What\'s your earliest memory?', 'What do you think about before you fall asleep?',
+    'What are you hiding?', 'Who did you let down?', 'What\'s your guilty pleasure?',
+    'If you could go back to one day, which would it be?', 'What do you pray for?',
+    'What do you lie about?', 'What do you wish people understood about you?',
+    'What\'s something you\'ve never told anyone?',
+    'What did you want to be when you grew up?', 'Who do you talk to when you\'re scared?',
+    'What\'s the bravest thing you\'ve ever done?', 'Do you believe in God?',
+    'What did your parents get wrong?', 'What would your ex say about you?',
+    'When was the last time you cried?', 'What\'s something you\'re proud of that nobody knows?',
+    'Have you ever been in a fight?', 'What\'s the worst job you ever had?',
+    'What do you think happens when we die?', 'What\'s the kindest thing a stranger ever did for you?',
+    'What habit are you ashamed of?', 'What do you want written on your tombstone?',
+    'What\'s your relationship with your mother like?', 'If money didn\'t matter, what would you do tomorrow?',
+    'What was the happiest day of your life?', 'What are you avoiding right now?',
+    'What\'s a promise you broke?', 'What would you tell your younger self?',
+    'What did you sacrifice?', 'What do you do when you can\'t sleep?',
+    'Who taught you how to love?', 'What\'s a lie you tell yourself?',
+    'What sound reminds you of home?', 'What did you learn too late?',
+    'When did you first feel old?', 'What did you lose that you still think about?',
+    'Who do you become when you\'re angry?', 'What would you do with one more day?',
+    'What do you pretend to like?', 'What were you doing when the world changed?',
+    'What did you build with your hands?', 'Who do you owe an apology?',
+    'What do you do when nobody needs you?', 'What smell takes you back?',
+    'What did freedom feel like the first time?', 'What are you waiting for?',
+    'What do you do with your loneliness?', 'Who do you see when you look in the mirror?',
+    'What was the last thing that made you belly laugh?', 'What\'s the closest you\'ve come to death?',
+    'What do you wish you could un-know?', 'What do you collect and why?',
+    'If you could hear one person\'s thoughts, whose?', 'What did you inherit besides genes?',
+    'What did you do that nobody thanked you for?', 'What did your best friend teach you?',
+    'What do you pretend doesn\'t bother you?', 'What was your first heartbreak?',
+    'What are you running from?', 'What does your body remember that your mind forgot?',
+    'What did you give up on?', 'What would you fight for?',
+    'When were you the most yourself?', 'What conversation do you keep having?',
+    'What do you hope your children never learn about you?', 'What\'s the bravest sentence you ever said out loud?'
+  ],
+  statusPairs: [
+    'Professor / Student', 'CEO / Intern', 'King / Peasant', 'Doctor / Patient',
+    'Director / Extra', 'Judge / Defendant', 'Drill sergeant / New recruit',
+    'Head chef / Dishwasher', 'Landlord / Tenant behind on rent',
+    'Airline pilot / Nervous passenger', 'Celebrity / Starstruck fan',
+    'Prison warden / Inmate', 'Guru / Disciple', 'Cool kid / New kid',
+    'Bouncer / Person not on the list', 'Master sommelier / Fast food worker',
+    'Surgeon / Medical student', 'Veteran cop / Rookie', 'Headmaster / Troublemaker',
+    'Art critic / Aspiring painter', 'Orchestra conductor / Last-chair violinist',
+    'Wedding planner / Bride\'s difficult mother', 'Talk show host / Reluctant guest',
+    'Border agent / Nervous traveler', 'Tenured professor / Adjunct',
+    'Maitre d\' / Walk-in without reservation', 'Ship captain / Stowaway',
+    'Bestselling author / Unpublished writer', 'Senior partner / First-year associate',
+    'Experienced midwife / First-time father', 'Museum curator / Bored security guard',
+    'Michelin inspector / Diner cook', 'Archbishop / Altar boy',
+    'Champion boxer / Corner man', 'Real estate mogul / First-time buyer',
+    'Fashion designer / Catalog model', 'Diplomat / Translator',
+    'Mafia don / New driver', 'Talent agent / Unknown comedian',
+    'Chess grandmaster / Park player', 'Airline first class / Economy middle seat',
+    'Published poet / Open mic regular', 'Master plumber / DIY homeowner',
+    'Concierge / Lost tourist', 'Head librarian / Loud teenager',
+    'Executive chef / Line cook on first day', 'Seasoned bartender / Underage kid with fake ID',
+    'Tenured professor / Student who didn\'t do the reading',
+    'Experienced nanny / New parent', 'Lead actor / Understudy',
+    'Building inspector / Nervous contractor', 'Immigration officer / Refugee',
+    'Funeral director / Grieving spouse', 'Grandmaster / First-time chess player',
+    'Olympic coach / Athlete who wants to quit', 'Auctioneer / Bidder who can\'t afford anything',
+    'Customs agent / Traveler with something to hide', 'Old money / New money',
+    'Headliner / Opening act', 'Bride / Maid of honor who slept with the groom',
+    'Retired general / Peace activist', 'Bank manager / Person begging for a loan',
+    'Orchestra conductor / First violin who thinks they should be conducting',
+    'Hospital chief / Whistleblower nurse', 'Landlord / Squatter',
+    'Border collie / cat (yes, play as animals)', 'Five-star restaurant / Food truck across the street',
+    'The person firing / The person being fired', 'Parent / Adult child moving back home'
+  ],
+  styles: [
+    'Film noir', 'Horror', 'Romance', 'Action movie', 'Shakespearean tragedy',
+    'Chekhov', 'Soap opera', 'Documentary', 'Tarantino', 'Wes Anderson',
+    'Musical theater', 'True crime podcast', 'Nature documentary', 'Telenovela',
+    'David Mamet', 'Spaghetti western', 'French New Wave', 'Kids cartoon',
+    'Oscar acceptance speech', 'Greek tragedy', 'Film noir detective',
+    'Sports commentary', 'Victorian melodrama', 'Sci-fi dystopia', 'Rom-com',
+    'Tennessee Williams', 'Pinter pause-heavy', 'Sorkin walk-and-talk',
+    'Werner Herzog narration', 'Coen Brothers', 'Christopher Nolan exposition',
+    'Hitchcock suspense', 'Pixar opening montage', 'Ken Burns documentary',
+    'Infomercial', 'TED Talk', 'Courtroom drama', 'Buddy cop movie',
+    'Gothic horror', 'Hallmark Christmas movie', 'David Lynch surrealism',
+    'Michael Bay explosion fest', 'Terrence Malick voiceover', 'Guy Ritchie heist',
+    'Kubrick cold precision', 'Hayao Miyazaki wonder', 'Quentin Tarantino standoff',
+    'Sofia Coppola quiet melancholy', 'Scorsese narration', 'Anderson courtroom',
+    'Beckett absurdism', 'Arthur Miller working class', 'Noel Coward drawing room',
+    'Eugene O\'Neill family drama', 'Harold Pinter menace', 'Caryl Churchill fractured time',
+    'Brecht breaking the fourth wall', 'Commedia dell\'arte', 'Japanese Noh theater',
+    'Greek chorus narration', 'Radio play from the 1940s', 'Silent film',
+    'Mockumentary', 'Found footage horror', 'Heist movie planning montage',
+    'Training montage', 'Film noir voiceover', 'Bollywood dance number',
+    'Anime internal monologue', 'Video game cutscene', 'True crime reenactment',
+    'Cooking competition show', 'Reality TV confessional', 'Home shopping channel',
+    'Children\'s educational show', 'Conspiracy YouTube video', 'ASMR',
+    'Drunk history', 'Nature documentary but about humans', 'Epic fantasy',
+    'Cyberpunk', 'Southern Gothic', 'Beat poetry', 'Screwball comedy',
+    'Italian neorealism', 'German expressionism', 'Mumblecore',
+    'Disaster movie', 'Medical drama', 'Spy thriller'
+  ],
+  secrets: [
+    'I\'m planning to propose tonight', 'I just found out I\'m moving to another country',
+    'I\'m hiding a huge mistake at work', 'I saw something I shouldn\'t have',
+    'I\'m planning to quit today', 'I have a winning lottery ticket in my pocket',
+    'I\'m meeting my birth parent for the first time', 'I just got terrible news from the doctor',
+    'I\'m wearing a wire', 'I broke their most prized possession',
+    'I\'m in love with my best friend\'s partner', 'I\'m leaving after this conversation',
+    'I stole something from this room', 'I just got out of prison and nobody knows',
+    'I\'m planning a surprise party that\'s about to go wrong',
+    'I just discovered I can read minds', 'I\'m saying goodbye without them knowing',
+    'I have 24 hours left to live', 'I\'m pretending to be someone I\'m not',
+    'I just witnessed a crime outside', 'I\'m the one who called the police',
+    'I\'m carrying an engagement ring I\'m about to return', 'I can\'t read and I\'m faking it',
+    'I just found out I\'m adopted', 'I\'m recording this entire conversation',
+    'My suitcase is full of cash', 'I\'m about to confess something terrible',
+    'I\'ve been lying about my name this whole time', 'I know their deepest secret',
+    'I\'m planning to disappear after tonight', 'I just got fired an hour ago',
+    'I\'m carrying someone else\'s ashes', 'I\'m allergic to what they\'re serving and too polite to say',
+    'I\'m here to say goodbye forever', 'I just realized I\'m in the wrong building',
+    'I forgot their name and it\'s way too late to ask', 'I owe them money I can\'t pay back',
+    'I\'m about to get on a plane and never come back', 'I just got the best news of my life and can\'t tell anyone',
+    'The person they\'re waiting for isn\'t coming, and I know why',
+    'I just swallowed a key that opens something important', 'I\'m a ghost and I just realized it',
+    'I can see five minutes into the future', 'This is the last time I\'ll ever be in this room',
+    'I\'m the reason they got the promotion', 'I buried something in this yard years ago',
+    'I\'m holding the only copy of something priceless', 'My twin is the one they think I am',
+    'I sold something that wasn\'t mine to sell', 'I\'ve been awake for three days',
+    'I\'m about to become incredibly famous and no one knows yet',
+    'The test results are in my pocket', 'I just deleted something I can\'t get back',
+    'I know where the body is', 'I wrote the anonymous letter',
+    'I\'m allergic to the host\'s cooking and eating it anyway out of love',
+    'I\'m carrying a ring I found that doesn\'t belong to me',
+    'I just realized I\'m in the wrong funeral', 'I know this building is about to be condemned',
+    'I\'m counting down from a number only I know', 'I just got a text that changed everything',
+    'I\'m pretending to be blind', 'This is the exact spot where something terrible happened to me',
+    'I\'m the one who wrote the graffiti', 'I have a ticket out of here and room for one more',
+    'I just realized I\'ve been talking to the wrong person this whole time',
+    'I can hear what the dog is thinking', 'I know their real name',
+    'I\'m wearing someone else\'s clothes and they don\'t fit'
+  ],
+  worldviews: [
+    'Everything is a competition', 'The government is always watching',
+    'Beauty is the only thing that matters', 'Nobody can be trusted',
+    'Rules are just suggestions', 'Everything happens for a reason',
+    'Money solves every problem', 'The past was always better',
+    'Technology is destroying humanity', 'You have to be cruel to be kind',
+    'Life is a party and I\'m the host', 'Everyone is secretly judging me',
+    'Nature is trying to kill us', 'Love conquers everything',
+    'There\'s a conspiracy behind everything', 'Comfort is the enemy of growth',
+    'People are fundamentally good', 'People are fundamentally selfish',
+    'The universe owes me', 'Suffering builds character',
+    'Nothing matters so you might as well enjoy it', 'I\'m the main character',
+    'Everything is a sign from the universe', 'Children are wiser than adults',
+    'The body keeps the score — everything is physical', 'Art is the only thing worth doing',
+    'Loyalty is the highest virtue', 'Everyone gets what they deserve',
+    'The system is rigged against people like me', 'Politeness is a form of lying',
+    'You can only trust family', 'Happiness is a choice',
+    'Intelligence is the most attractive quality', 'The world peaked in the 1970s',
+    'Death is nothing to be afraid of', 'Everyone is faking it',
+    'Hard work always pays off', 'Pleasure is the meaning of life',
+    'Silence is more powerful than words', 'I was put here to help people whether they want it or not',
+    'If you\'re not growing, you\'re dying', 'Revenge is underrated',
+    'Animals are better than people', 'Marriage is a trap',
+    'The truth always comes out', 'Pain is just weakness leaving the body',
+    'Everything is political', 'You have to break rules to make anything great',
+    'There\'s no such thing as luck', 'The world is fundamentally absurd',
+    'You should only do what brings you joy', 'Fear is the best motivator',
+    'The rich have a responsibility to lead', 'Normal people are the dangerous ones',
+    'Tradition is the only thing holding society together',
+    'Science will eventually explain everything', 'Intuition trumps logic every time',
+    'Everyone is addicted to something', 'There\'s dignity in any kind of work',
+    'Manners are the foundation of civilization', 'The meek will never inherit anything',
+    'You should treat every day like your last', 'Secrets are what make people interesting',
+    'The body never lies', 'Music is the closest thing to God',
+    'You are what you repeatedly do', 'Most advice is projection',
+    'Freedom is just another word for nothing left to lose'
+  ],
+  nonfictionTopics: [
+    'How a water heater works', 'The War of 1812', 'How bees make honey',
+    'The invention of the printing press', 'How wifi signals travel',
+    'The history of salt', 'Why the sky is blue', 'How vaccines work',
+    'The fall of the Roman Empire', 'How a car engine works',
+    'The history of coffee', 'How tides work', 'The space race',
+    'How refrigerators keep things cold', 'The French Revolution',
+    'How birds navigate migration', 'The Silk Road', 'How sourdough bread rises',
+    'The history of democracy', 'How lightning forms',
+    'Why we dream', 'How the stock market works', 'The life cycle of a star',
+    'How antibiotics were discovered', 'The building of the Panama Canal',
+    'How an airplane stays in the air', 'The history of zero',
+    'How cheese is made', 'Why leaves change color', 'How the internet works',
+    'The Dust Bowl', 'How memory works in the brain', 'The invention of the telephone',
+    'How earthquakes happen', 'The history of chocolate', 'How a nuclear reactor works',
+    'Why the ocean is salty', 'The construction of the Brooklyn Bridge',
+    'How a compass works', 'The history of fire departments',
+    'Why we have fingerprints', 'The science of fermentation', 'How bridges bear weight',
+    'The invention of anesthesia', 'How volcanoes form', 'The history of maps',
+    'Why music gives us chills', 'How submarines work', 'The discovery of penicillin',
+    'How glaciers carve valleys', 'The history of money', 'Why we yawn',
+    'How the Panama Canal changed trade', 'The physics of a curveball',
+    'How paper is made', 'The history of surgery', 'How stars die',
+    'Why humans cook food', 'How the postal system works',
+    'The invention of the wheel', 'How coral reefs form', 'The history of timekeeping',
+    'How soap cleans things', 'The science behind rainbows', 'How radar works',
+    'The history of libraries', 'How the human eye sees color',
+    'Why some animals hibernate', 'The building of the transcontinental railroad',
+    'How batteries store energy', 'The history of spices', 'How concrete works',
+    'Why the moon has phases', 'How elevators work', 'The history of glass',
+    'How hurricanes form', 'The invention of photography', 'How the immune system fights infection'
+  ]
+};
+
+// ── State ──────────────────────────────────────────────────
+
+let currentExercise = null;
+let timerInterval = null;
+let timerEndTime = null;
+let timerDuration = 60;
+let timerRemaining = 60;
+let timerRunning = false;
+let favorites = JSON.parse(localStorage.getItem('improv-favorites') || '[]');
+let currentPromptPools = [];
+let audioCtx = null;
+
+// Apply saved favorites
+favorites.forEach(id => {
+  const ex = exercises.find(e => e.id === id);
+  if (ex) ex.favorite = true;
+});
+
+// ── Navigation ─────────────────────────────────────────────
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() {
+  stopTimer();
+  showView('view-home');
+}
+
+// ── Random Exercise ────────────────────────────────────────
+
+function randomExercise() {
+  // Weight favorites 3x
+  const pool = [];
+  exercises.forEach(ex => {
+    pool.push(ex);
+    if (ex.favorite) { pool.push(ex); pool.push(ex); }
+  });
+  // Avoid repeating same exercise
+  let pick;
+  let attempts = 0;
+  do {
+    pick = pool[Math.floor(Math.random() * pool.length)];
+    attempts++;
+  } while (pick === currentExercise && exercises.length > 1 && attempts < 20);
+  showExercise(pick);
+}
+
+// ── Show Exercise ──────────────────────────────────────────
+
+function showExercise(ex) {
+  currentExercise = ex;
+  stopTimer();
+
+  document.getElementById('ex-header-title').textContent = '';
+  document.getElementById('ex-name').textContent = ex.name;
+  document.getElementById('ex-source').textContent = ex.source;
+  document.getElementById('ex-category').textContent = ex.category;
+  document.getElementById('ex-instructions').textContent = ex.instructions;
+  document.getElementById('ex-purpose').innerHTML = ex.purpose;
+
+  // Favorite star
+  updateStarButton();
+
+  // Timer default
+  timerDuration = ex.duration || 60;
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  updatePresetButtons();
+
+  // Prompts
+  const promptSection = document.getElementById('prompt-section');
+  if (ex.prompts && ex.prompts.length > 0) {
+    promptSection.style.display = 'block';
+    document.getElementById('prompt-label').textContent = ex.promptLabel || 'Prompt';
+    currentPromptPools = ex.prompts;
+    newPrompt();
+  } else {
+    promptSection.style.display = 'none';
+    currentPromptPools = [];
+  }
+
+  // Scroll to top
+  document.getElementById('exercise-scroll').scrollTop = 0;
+
+  showView('view-exercise');
+
+  // Animate
+  document.getElementById('ex-name').classList.remove('animate-in');
+  void document.getElementById('ex-name').offsetWidth;
+  document.getElementById('ex-name').classList.add('animate-in');
+}
+
+// ── Prompts ────────────────────────────────────────────────
+
+function newPrompt() {
+  if (currentPromptPools.length === 0) return;
+
+  let parts = [];
+  currentPromptPools.forEach(poolName => {
+    const pool = prompts[poolName];
+    if (pool) {
+      parts.push(pool[Math.floor(Math.random() * pool.length)]);
+    }
+  });
+
+  const val = document.getElementById('prompt-value');
+  val.textContent = parts.join('  /  ');
+  val.classList.remove('prompt-pop');
+  void val.offsetWidth;
+  val.classList.add('prompt-pop');
+}
+
+// ── Favorites ──────────────────────────────────────────────
+
+function toggleFavorite() {
+  if (!currentExercise) return;
+  currentExercise.favorite = !currentExercise.favorite;
+
+  if (currentExercise.favorite) {
+    if (!favorites.includes(currentExercise.id)) favorites.push(currentExercise.id);
+  } else {
+    favorites = favorites.filter(id => id !== currentExercise.id);
+  }
+  localStorage.setItem('improv-favorites', JSON.stringify(favorites));
+  updateStarButton();
+  updateFavCount();
+}
+
+function updateStarButton() {
+  const btn = document.getElementById('ex-star');
+  if (currentExercise && currentExercise.favorite) {
+    btn.innerHTML = '&#9733;';
+    btn.classList.add('favorited');
+  } else {
+    btn.innerHTML = '&#9734;';
+    btn.classList.remove('favorited');
+  }
+}
+
+// ── Timer ──────────────────────────────────────────────────
+
+function setTimer(seconds) {
+  stopTimer();
+  timerDuration = seconds;
+  timerRemaining = seconds;
+  updateTimerDisplay();
+  updatePresetButtons();
+}
+
+function updatePresetButtons() {
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.classList.remove('selected');
+  });
+  const presetMap = { 30: 0, 60: 1, 120: 2, 300: 3 };
+  const idx = presetMap[timerDuration];
+  if (idx !== undefined) {
+    document.querySelectorAll('.preset-btn')[idx].classList.add('selected');
+  }
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    stopTimer();
+  } else {
+    startTimer();
+  }
+}
+
+function startTimer() {
+  if (timerRemaining <= 0) {
+    timerRemaining = timerDuration;
+  }
+
+  // Ensure audio context is created on user gesture
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  timerEndTime = Date.now() + timerRemaining * 1000;
+  timerRunning = true;
+
+  const btn = document.getElementById('btn-start');
+  btn.textContent = 'Stop';
+  btn.classList.remove('start');
+  btn.classList.add('stop');
+
+  const display = document.getElementById('timer-display');
+  display.classList.add('running');
+  display.classList.remove('done');
+
+  timerInterval = setInterval(() => {
+    const now = Date.now();
+    timerRemaining = Math.max(0, Math.ceil((timerEndTime - now) / 1000));
+    updateTimerDisplay();
+
+    if (timerRemaining <= 0) {
+      stopTimer();
+      playChime();
+      display.classList.add('done');
+    }
+  }, 100);
+}
+
+function stopTimer() {
+  timerRunning = false;
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  const btn = document.getElementById('btn-start');
+  btn.textContent = 'Start';
+  btn.classList.remove('stop');
+  btn.classList.add('start');
+
+  document.getElementById('timer-display').classList.remove('running');
+}
+
+function resetTimer() {
+  stopTimer();
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  document.getElementById('timer-display').classList.remove('done');
+}
+
+function updateTimerDisplay() {
+  const min = Math.floor(timerRemaining / 60);
+  const sec = timerRemaining % 60;
+  document.getElementById('timer-display').textContent =
+    min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+// ── Audio Chime ────────────────────────────────────────────
+
+function playChime() {
+  if (!audioCtx) return;
+  const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const t = audioCtx.currentTime + i * 0.18;
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 1.0);
+  });
+}
+
+// ── Favorites View ─────────────────────────────────────────
+
+function showFavorites() {
+  const list = document.getElementById('favorites-list');
+  const empty = document.getElementById('favorites-empty');
+  list.innerHTML = '';
+
+  const favs = exercises.filter(ex => ex.favorite);
+
+  if (favs.length === 0) {
+    list.style.display = 'none';
+    empty.style.display = 'flex';
+  } else {
+    list.style.display = 'block';
+    empty.style.display = 'none';
+
+    favs.forEach(ex => {
+      const item = document.createElement('div');
+      item.className = 'browse-item';
+      item.onclick = () => showExercise(ex);
+      item.innerHTML =
+        '<div class="name">' + ex.name + '</div>' +
+        '<div class="source-tag">' + ex.source.split('/')[0].trim() + '</div>' +
+        '<div class="fav-indicator">&#9733;</div>';
+      list.appendChild(item);
+    });
+  }
+
+  showView('view-favorites');
+}
+
+function updateFavCount() {
+  const n = exercises.filter(ex => ex.favorite).length;
+  document.getElementById('fav-count').textContent = n === 0 ? 'Star exercises to add them' : n + ' exercise' + (n === 1 ? '' : 's');
+}
+
+// ── Browse ─────────────────────────────────────────────────
+
+const categoryOrder = [
+  'Warm-up', 'Thinking', 'Killing the Censor', 'Speed & Specificity',
+  'Character', 'Physical / Space', 'Scenic', 'Narrative',
+  'Status & Character', 'Environment', 'Game & Pattern', 'Emotional Range',
+  'Listening & Reaction', 'Solo Scene Work', 'Body & Voice',
+  'Observation & Truth', 'Bonus'
+];
+
+function showBrowse() {
+  const list = document.getElementById('browse-list');
+  list.innerHTML = '';
+
+  // Group by category
+  const categories = {};
+  exercises.forEach(ex => {
+    if (!categories[ex.category]) categories[ex.category] = [];
+    categories[ex.category].push(ex);
+  });
+
+  // Render in defined order
+  categoryOrder.forEach(cat => {
+    if (!categories[cat]) return;
+    const section = document.createElement('div');
+    section.className = 'browse-category';
+
+    const header = document.createElement('div');
+    header.className = 'browse-category-header';
+    header.textContent = cat + ' (' + categories[cat].length + ')';
+    section.appendChild(header);
+
+    categories[cat].forEach(ex => {
+      const item = document.createElement('div');
+      item.className = 'browse-item';
+      item.onclick = () => showExercise(ex);
+      item.innerHTML =
+        '<div class="name">' + ex.name + '</div>' +
+        '<div class="source-tag">' + ex.source.split('/')[0].trim() + '</div>' +
+        (ex.favorite ? '<div class="fav-indicator">&#9733;</div>' : '');
+      section.appendChild(item);
+    });
+
+    list.appendChild(section);
+  });
+
+  showView('view-browse');
+}
+
+// ── Visibility API (fix timer drift on screen lock) ───────
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && timerRunning && timerEndTime) {
+    const now = Date.now();
+    timerRemaining = Math.max(0, Math.ceil((timerEndTime - now) / 1000));
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      stopTimer();
+      playChime();
+      document.getElementById('timer-display').classList.add('done');
+    }
+  }
+});
+
+// ── Service Worker (offline support) ──────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+// ── Init ───────────────────────────────────────────────────
+updateTimerDisplay();
+updateFavCount();
+</script>
+</body>
+</html>
