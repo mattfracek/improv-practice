@@ -1858,8 +1858,15 @@ function showExercise(ex) {
     currentPromptPools = [];
   }
 
-  // Scroll to top
-  document.getElementById('exercise-scroll').scrollTop = 0;
+  // Scroll: in continuous mode, jump to prompt/timer area. Otherwise top.
+  if (continuousMode) {
+    const target = (ex.prompts && ex.prompts.length > 0)
+      ? document.getElementById('prompt-section')
+      : document.querySelector('.timer-section');
+    setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  } else {
+    document.getElementById('exercise-scroll').scrollTop = 0;
+  }
 
   showView('view-exercise');
 
