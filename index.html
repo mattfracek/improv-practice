@@ -537,6 +537,8 @@ body {
       <button class="prompt-btn" style="background:var(--accent);margin-bottom:20px;" onclick="randomSceneBoth()">Randomize Both</button>
       <div class="timer-section">
         <div class="timer-presets" id="scene-timer-presets">
+          <button class="preset-btn" onclick="setSceneTimer(15)">0:15</button>
+          <button class="preset-btn" onclick="setSceneTimer(30)">0:30</button>
           <button class="preset-btn" onclick="setSceneTimer(60)">1:00</button>
           <button class="preset-btn selected" onclick="setSceneTimer(120)">2:00</button>
           <button class="preset-btn" onclick="setSceneTimer(300)">5:00</button>
@@ -568,6 +570,8 @@ body {
       </div>
       <div class="timer-section">
         <div class="timer-presets" id="char-timer-presets">
+          <button class="preset-btn" onclick="setCharTimer(15)">0:15</button>
+          <button class="preset-btn" onclick="setCharTimer(30)">0:30</button>
           <button class="preset-btn" onclick="setCharTimer(60)">1:00</button>
           <button class="preset-btn selected" onclick="setCharTimer(120)">2:00</button>
           <button class="preset-btn" onclick="setCharTimer(300)">5:00</button>
@@ -2346,7 +2350,7 @@ function setSceneTimer(seconds) {
   sceneTimerRemaining = seconds;
   updateSceneTimerDisplay();
   document.querySelectorAll('#scene-timer-presets .preset-btn').forEach(b => b.classList.remove('selected'));
-  const map = { 60: 0, 120: 1, 300: 2 };
+  const map = { 15: 0, 30: 1, 60: 2, 120: 3, 300: 4 };
   if (map[seconds] !== undefined) document.querySelectorAll('#scene-timer-presets .preset-btn')[map[seconds]].classList.add('selected');
 }
 
@@ -2422,7 +2426,7 @@ function setCharTimer(seconds) {
   charTimerRemaining = seconds;
   updateCharTimerDisplay();
   document.querySelectorAll('#char-timer-presets .preset-btn').forEach(b => b.classList.remove('selected'));
-  const map = { 60: 0, 120: 1, 300: 2 };
+  const map = { 15: 0, 30: 1, 60: 2, 120: 3, 300: 4 };
   if (map[seconds] !== undefined) document.querySelectorAll('#char-timer-presets .preset-btn')[map[seconds]].classList.add('selected');
 }
 
