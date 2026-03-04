@@ -421,6 +421,20 @@ body {
           <div class="sublabel">Just hit go</div>
         </div>
       </button>
+      <button class="home-btn" onclick="showScenePractice()">
+        <div class="icon" style="background:#fb923c33;color:#fb923c;">&#127917;</div>
+        <div class="label-group">
+          Scene Starter
+          <div class="sublabel">Random location + relationship</div>
+        </div>
+      </button>
+      <button class="home-btn" onclick="showCharacterPractice()">
+        <div class="icon" style="background:#a78bfa33;color:#a78bfa;">&#127917;</div>
+        <div class="label-group">
+          Random Character
+          <div class="sublabel">Embody someone new</div>
+        </div>
+      </button>
       <button class="home-btn" onclick="showFavorites()">
         <div class="icon gold">&#9733;</div>
         <div class="label-group">
@@ -499,6 +513,71 @@ body {
     <div class="empty-state" id="favorites-empty" style="display:none">
       <p>No favorites yet.</p>
       <p class="empty-hint">Tap the star on any exercise to add it here.</p>
+    </div>
+  </div>
+
+  <!-- SCENE PRACTICE -->
+  <div id="view-scene" class="view">
+    <div class="header">
+      <button class="back-btn" onclick="goHome()">&#8249;</button>
+      <h1>Scene Starter</h1>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="exercise-scroll" style="padding: 0 16px;">
+      <div class="prompt-section" style="display:block">
+        <div class="prompt-label">Location</div>
+        <div class="prompt-value" id="scene-location" style="color:var(--blue);"></div>
+        <button class="prompt-btn" style="background:var(--blue);" onclick="randomSceneLocation()">New Location</button>
+      </div>
+      <div class="prompt-section" style="display:block">
+        <div class="prompt-label">Relationship</div>
+        <div class="prompt-value" id="scene-relationship" style="color:var(--purple);"></div>
+        <button class="prompt-btn" style="background:var(--purple);" onclick="randomSceneRelationship()">New Relationship</button>
+      </div>
+      <button class="prompt-btn" style="background:var(--accent);margin-bottom:20px;" onclick="randomSceneBoth()">Randomize Both</button>
+      <div class="timer-section">
+        <div class="timer-presets" id="scene-timer-presets">
+          <button class="preset-btn" onclick="setSceneTimer(60)">1:00</button>
+          <button class="preset-btn selected" onclick="setSceneTimer(120)">2:00</button>
+          <button class="preset-btn" onclick="setSceneTimer(300)">5:00</button>
+        </div>
+        <div class="timer-display" id="scene-timer-display">2:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn reset" onclick="resetSceneTimer()">Reset</button>
+          <button class="timer-btn start" id="scene-btn-start" onclick="toggleSceneTimer()">Start</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARACTER PRACTICE -->
+  <div id="view-character" class="view">
+    <div class="header">
+      <button class="back-btn" onclick="goHome()">&#8249;</button>
+      <h1>Random Character</h1>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="exercise-scroll" style="padding: 0 16px;">
+      <div class="exercise-purpose" style="margin-bottom:20px;">
+        <strong>Embody this character fully.</strong> How do they stand? Walk? Breathe? What do they want? What are they afraid of? Speak as them — introduce yourself, tell a story, have an opinion.
+      </div>
+      <div class="prompt-section" style="display:block">
+        <div class="prompt-label">Your Character</div>
+        <div class="prompt-value" id="char-value" style="color:var(--purple);font-size:26px;"></div>
+        <button class="prompt-btn" style="background:var(--purple);" onclick="randomCharacter()">New Character</button>
+      </div>
+      <div class="timer-section">
+        <div class="timer-presets" id="char-timer-presets">
+          <button class="preset-btn" onclick="setCharTimer(60)">1:00</button>
+          <button class="preset-btn selected" onclick="setCharTimer(120)">2:00</button>
+          <button class="preset-btn" onclick="setCharTimer(300)">5:00</button>
+        </div>
+        <div class="timer-display" id="char-timer-display">2:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn reset" onclick="resetCharTimer()">Reset</button>
+          <button class="timer-btn start" id="char-btn-start" onclick="toggleCharTimer()">Start</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1770,6 +1849,53 @@ const prompts = {
     'How batteries store energy', 'The history of spices', 'How concrete works',
     'Why the moon has phases', 'How elevators work', 'The history of glass',
     'How hurricanes form', 'The invention of photography', 'How the immune system fights infection'
+  ],
+  relationships: [
+    'Married couple', 'Siblings', 'Parent and teenager', 'Boss and employee', 'Best friends since childhood',
+    'Exes who just ran into each other', 'Roommates', 'Strangers on a plane', 'Teacher and student',
+    'Neighbors who never talk', 'Grandparent and grandchild', 'Coworkers who secretly hate each other',
+    'Old friends who haven\'t spoken in years', 'Couple on a first date', 'Twins', 'Rivals',
+    'Mentor and mentee', 'Landlord and tenant', 'Doctor and patient', 'Cop and suspect',
+    'Barista and regular customer', 'Coach and athlete', 'Babysitter and parent coming home late',
+    'Two people stuck in an elevator', 'Secret lovers', 'Business partners about to split',
+    'Therapist and client', 'Wedding planner and anxious bride', 'Long-lost relatives',
+    'Childhood bully and their victim, now adults', 'Two strangers at a bus stop',
+    'Band members after a bad show', 'Priest and confessor', 'Divorced parents at a kid\'s event',
+    'Uber driver and chatty passenger', 'New neighbors introducing themselves',
+    'Dog walker and dog owner', 'Hairdresser and longtime client', 'Cellmates',
+    'Two people waiting for the same job interview', 'Parent dropping kid off at college',
+    'Couple deciding whether to break up', 'In-laws who don\'t get along',
+    'Two strangers who grabbed each other\'s luggage', 'Nurse and difficult patient',
+    'Manager and employee asking for a raise', 'Two people who matched on a dating app',
+    'Estranged father and adult child', 'College roommates meeting for the first time',
+    'Funeral attendees who only know the deceased', 'Hitchhiker and driver',
+    'Wedding guests who don\'t know anyone else', 'Couples counselor and a couple mid-fight',
+    'Old army buddies', 'Celebrity and obsessed fan', 'Two witnesses to the same crime',
+    'Tutor and failing student', 'Real estate agent and impossible buyer',
+    'Pilot and nervous first-time flyer', 'Chef and food critic',
+    'Personal trainer and client who won\'t try', 'Dance partners who just met',
+    'Parent and child\'s teacher at a conference', 'Surgeon and patient before surgery',
+    'Car salesman and skeptical customer', 'Siblings cleaning out dead parent\'s house',
+    'Boss and employee on the day of a firing', 'Bridesmaids who don\'t like each other',
+    'Plumber and homeowner with a flooded house', 'Two people at a support group',
+    'Delivery person and lonely shut-in', 'Photographer and reluctant subject',
+    'Couple hiding a secret from each other', 'Lifeguard and person who can\'t swim',
+    'Two strangers in a hospital waiting room', 'Travel buddies who are getting on each other\'s nerves',
+    'Childhood sweethearts reuniting at a reunion', 'Vet and pet owner with bad news',
+    'Immigration officer and desperate traveler', 'Mechanic and customer who can\'t afford the repair',
+    'Two people competing for the same promotion', 'Mother-in-law and daughter-in-law',
+    'Astronauts stuck together in a capsule', 'Lawyer and guilty client',
+    'Scout leader and kid who hates the outdoors', 'Bride and groom five minutes before the wedding',
+    'Two magicians sharing a dressing room', 'Fortune teller and skeptic',
+    'Flight attendant and drunk passenger', 'Ghost and person living in their old house',
+    'Retired couple with nothing to talk about', 'Clown and child who is terrified of clowns',
+    'Two chefs competing for the same Michelin star', 'Monk and lost tourist',
+    'Survivalists meeting after the apocalypse', 'Nanny and child who won\'t behave',
+    'Dentist and patient who hasn\'t been in 10 years', 'Host and last guest who won\'t leave the party',
+    'Moving company worker and hoarder', 'Pen pals meeting in person for the first time',
+    'Castaway and rescuer', 'Conjoined twins', 'Imaginary friend and the child who outgrew them',
+    'Two spies who don\'t know the other is also a spy', 'Retiring employee and their replacement',
+    'Two strangers sharing a hospital room', 'Parent teaching teen to drive'
   ]
 };
 
@@ -1802,6 +1928,8 @@ function showView(id) {
 
 function goHome() {
   stopTimer();
+  stopSceneTimer();
+  stopCharTimer();
   if (continuousMode) toggleContinuous();
   showView('view-home');
 }
@@ -1938,7 +2066,7 @@ function updatePresetButtons() {
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.classList.remove('selected');
   });
-  const presetMap = { 30: 0, 60: 1, 120: 2, 300: 3 };
+  const presetMap = { 10: 0, 30: 1, 60: 2, 120: 3, 300: 4 };
   const idx = presetMap[timerDuration];
   if (idx !== undefined) {
     document.querySelectorAll('.preset-btn')[idx].classList.add('selected');
@@ -1965,6 +2093,7 @@ function startTimer() {
 
   timerEndTime = Date.now() + timerRemaining * 1000;
   timerRunning = true;
+  requestWakeLock();
 
   const btn = document.getElementById('btn-start');
   btn.textContent = 'Stop';
@@ -2005,6 +2134,7 @@ function stopTimer() {
   btn.classList.add('start');
 
   document.getElementById('timer-display').classList.remove('running');
+  if (!continuousMode) releaseWakeLock();
 }
 
 function resetTimer() {
@@ -2175,18 +2305,188 @@ function showBrowse() {
   showView('view-browse');
 }
 
+// ── Scene Practice ────────────────────────────────────────
+
+let sceneTimerInterval = null;
+let sceneTimerEndTime = null;
+let sceneTimerDuration = 120;
+let sceneTimerRemaining = 120;
+let sceneTimerRunning = false;
+
+function showScenePractice() {
+  randomSceneBoth();
+  sceneTimerDuration = 120;
+  sceneTimerRemaining = 120;
+  updateSceneTimerDisplay();
+  showView('view-scene');
+}
+
+function randomSceneLocation() {
+  const loc = prompts.locations[Math.floor(Math.random() * prompts.locations.length)];
+  const el = document.getElementById('scene-location');
+  el.textContent = loc;
+  el.classList.remove('prompt-pop'); void el.offsetWidth; el.classList.add('prompt-pop');
+}
+
+function randomSceneRelationship() {
+  const rel = prompts.relationships[Math.floor(Math.random() * prompts.relationships.length)];
+  const el = document.getElementById('scene-relationship');
+  el.textContent = rel;
+  el.classList.remove('prompt-pop'); void el.offsetWidth; el.classList.add('prompt-pop');
+}
+
+function randomSceneBoth() {
+  randomSceneLocation();
+  randomSceneRelationship();
+}
+
+function setSceneTimer(seconds) {
+  stopSceneTimer();
+  sceneTimerDuration = seconds;
+  sceneTimerRemaining = seconds;
+  updateSceneTimerDisplay();
+  document.querySelectorAll('#scene-timer-presets .preset-btn').forEach(b => b.classList.remove('selected'));
+  const map = { 60: 0, 120: 1, 300: 2 };
+  if (map[seconds] !== undefined) document.querySelectorAll('#scene-timer-presets .preset-btn')[map[seconds]].classList.add('selected');
+}
+
+function toggleSceneTimer() {
+  if (sceneTimerRunning) { stopSceneTimer(); } else { startSceneTimer(); }
+}
+
+function startSceneTimer() {
+  if (sceneTimerRemaining <= 0) sceneTimerRemaining = sceneTimerDuration;
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  sceneTimerEndTime = Date.now() + sceneTimerRemaining * 1000;
+  sceneTimerRunning = true;
+  requestWakeLock();
+  const btn = document.getElementById('scene-btn-start');
+  btn.textContent = 'Stop'; btn.classList.remove('start'); btn.classList.add('stop');
+  document.getElementById('scene-timer-display').classList.add('running');
+  document.getElementById('scene-timer-display').classList.remove('done');
+  sceneTimerInterval = setInterval(() => {
+    sceneTimerRemaining = Math.max(0, Math.ceil((sceneTimerEndTime - Date.now()) / 1000));
+    updateSceneTimerDisplay();
+    if (sceneTimerRemaining <= 0) { stopSceneTimer(); playChime(); document.getElementById('scene-timer-display').classList.add('done'); }
+  }, 100);
+}
+
+function stopSceneTimer() {
+  sceneTimerRunning = false;
+  if (sceneTimerInterval) { clearInterval(sceneTimerInterval); sceneTimerInterval = null; }
+  const btn = document.getElementById('scene-btn-start');
+  btn.textContent = 'Start'; btn.classList.remove('stop'); btn.classList.add('start');
+  document.getElementById('scene-timer-display').classList.remove('running');
+  releaseWakeLock();
+}
+
+function resetSceneTimer() {
+  stopSceneTimer();
+  sceneTimerRemaining = sceneTimerDuration;
+  updateSceneTimerDisplay();
+  document.getElementById('scene-timer-display').classList.remove('done');
+}
+
+function updateSceneTimerDisplay() {
+  const min = Math.floor(sceneTimerRemaining / 60);
+  const sec = sceneTimerRemaining % 60;
+  document.getElementById('scene-timer-display').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+// ── Character Practice ────────────────────────────────────
+
+let charTimerInterval = null;
+let charTimerEndTime = null;
+let charTimerDuration = 120;
+let charTimerRemaining = 120;
+let charTimerRunning = false;
+
+function showCharacterPractice() {
+  randomCharacter();
+  charTimerDuration = 120;
+  charTimerRemaining = 120;
+  updateCharTimerDisplay();
+  showView('view-character');
+}
+
+function randomCharacter() {
+  const ch = prompts.characters[Math.floor(Math.random() * prompts.characters.length)];
+  const el = document.getElementById('char-value');
+  el.textContent = ch;
+  el.classList.remove('prompt-pop'); void el.offsetWidth; el.classList.add('prompt-pop');
+}
+
+function setCharTimer(seconds) {
+  stopCharTimer();
+  charTimerDuration = seconds;
+  charTimerRemaining = seconds;
+  updateCharTimerDisplay();
+  document.querySelectorAll('#char-timer-presets .preset-btn').forEach(b => b.classList.remove('selected'));
+  const map = { 60: 0, 120: 1, 300: 2 };
+  if (map[seconds] !== undefined) document.querySelectorAll('#char-timer-presets .preset-btn')[map[seconds]].classList.add('selected');
+}
+
+function toggleCharTimer() {
+  if (charTimerRunning) { stopCharTimer(); } else { startCharTimer(); }
+}
+
+function startCharTimer() {
+  if (charTimerRemaining <= 0) charTimerRemaining = charTimerDuration;
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  charTimerEndTime = Date.now() + charTimerRemaining * 1000;
+  charTimerRunning = true;
+  requestWakeLock();
+  const btn = document.getElementById('char-btn-start');
+  btn.textContent = 'Stop'; btn.classList.remove('start'); btn.classList.add('stop');
+  document.getElementById('char-timer-display').classList.add('running');
+  document.getElementById('char-timer-display').classList.remove('done');
+  charTimerInterval = setInterval(() => {
+    charTimerRemaining = Math.max(0, Math.ceil((charTimerEndTime - Date.now()) / 1000));
+    updateCharTimerDisplay();
+    if (charTimerRemaining <= 0) { stopCharTimer(); playChime(); document.getElementById('char-timer-display').classList.add('done'); }
+  }, 100);
+}
+
+function stopCharTimer() {
+  charTimerRunning = false;
+  if (charTimerInterval) { clearInterval(charTimerInterval); charTimerInterval = null; }
+  const btn = document.getElementById('char-btn-start');
+  btn.textContent = 'Start'; btn.classList.remove('stop'); btn.classList.add('start');
+  document.getElementById('char-timer-display').classList.remove('running');
+  releaseWakeLock();
+}
+
+function resetCharTimer() {
+  stopCharTimer();
+  charTimerRemaining = charTimerDuration;
+  updateCharTimerDisplay();
+  document.getElementById('char-timer-display').classList.remove('done');
+}
+
+function updateCharTimerDisplay() {
+  const min = Math.floor(charTimerRemaining / 60);
+  const sec = charTimerRemaining % 60;
+  document.getElementById('char-timer-display').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
 // ── Visibility API (fix timer drift on screen lock) ───────
 
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && timerRunning && timerEndTime) {
-    const now = Date.now();
-    timerRemaining = Math.max(0, Math.ceil((timerEndTime - now) / 1000));
+  if (document.hidden) return;
+  if (timerRunning && timerEndTime) {
+    timerRemaining = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
     updateTimerDisplay();
-    if (timerRemaining <= 0) {
-      stopTimer();
-      playChime();
-      document.getElementById('timer-display').classList.add('done');
-    }
+    if (timerRemaining <= 0) { stopTimer(); playChime(); document.getElementById('timer-display').classList.add('done'); }
+  }
+  if (sceneTimerRunning && sceneTimerEndTime) {
+    sceneTimerRemaining = Math.max(0, Math.ceil((sceneTimerEndTime - Date.now()) / 1000));
+    updateSceneTimerDisplay();
+    if (sceneTimerRemaining <= 0) { stopSceneTimer(); playChime(); document.getElementById('scene-timer-display').classList.add('done'); }
+  }
+  if (charTimerRunning && charTimerEndTime) {
+    charTimerRemaining = Math.max(0, Math.ceil((charTimerEndTime - Date.now()) / 1000));
+    updateCharTimerDisplay();
+    if (charTimerRemaining <= 0) { stopCharTimer(); playChime(); document.getElementById('char-timer-display').classList.add('done'); }
   }
 });
 
