@@ -548,6 +548,10 @@ body {
           <button class="timer-btn reset" onclick="resetSceneTimer()">Reset</button>
           <button class="timer-btn start" id="scene-btn-start" onclick="toggleSceneTimer()">Start</button>
         </div>
+        <button class="continuous-toggle" id="scene-btn-continuous" onclick="toggleSceneContinuous()">
+          <span class="cont-icon">&#9654;&#9654;</span>
+          <span>Continuous</span>
+        </button>
       </div>
     </div>
   </div>
@@ -581,6 +585,10 @@ body {
           <button class="timer-btn reset" onclick="resetCharTimer()">Reset</button>
           <button class="timer-btn start" id="char-btn-start" onclick="toggleCharTimer()">Start</button>
         </div>
+        <button class="continuous-toggle" id="char-btn-continuous" onclick="toggleCharContinuous()">
+          <span class="cont-icon">&#9654;&#9654;</span>
+          <span>Continuous</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1935,6 +1943,8 @@ function goHome() {
   stopSceneTimer();
   stopCharTimer();
   if (continuousMode) toggleContinuous();
+  if (sceneContinuous) toggleSceneContinuous();
+  if (charContinuous) toggleCharContinuous();
   showView('view-home');
 }
 
@@ -2316,6 +2326,7 @@ let sceneTimerEndTime = null;
 let sceneTimerDuration = 120;
 let sceneTimerRemaining = 120;
 let sceneTimerRunning = false;
+let sceneContinuous = false;
 
 function showScenePractice() {
   randomSceneBoth();
@@ -2371,7 +2382,21 @@ function startSceneTimer() {
   sceneTimerInterval = setInterval(() => {
     sceneTimerRemaining = Math.max(0, Math.ceil((sceneTimerEndTime - Date.now()) / 1000));
     updateSceneTimerDisplay();
-    if (sceneTimerRemaining <= 0) { stopSceneTimer(); playChime(); document.getElementById('scene-timer-display').classList.add('done'); }
+    if (sceneTimerRemaining <= 0) {
+      stopSceneTimer();
+      playChime();
+      if (sceneContinuous) {
+        document.getElementById('scene-timer-display').classList.remove('running');
+        setTimeout(() => {
+          randomSceneBoth();
+          sceneTimerRemaining = sceneTimerDuration;
+          updateSceneTimerDisplay();
+          setTimeout(() => startSceneTimer(), 600);
+        }, 1500);
+      } else {
+        document.getElementById('scene-timer-display').classList.add('done');
+      }
+    }
   }, 100);
 }
 
@@ -2381,7 +2406,7 @@ function stopSceneTimer() {
   const btn = document.getElementById('scene-btn-start');
   btn.textContent = 'Start'; btn.classList.remove('stop'); btn.classList.add('start');
   document.getElementById('scene-timer-display').classList.remove('running');
-  releaseWakeLock();
+  if (!sceneContinuous) releaseWakeLock();
 }
 
 function resetSceneTimer() {
@@ -2397,6 +2422,18 @@ function updateSceneTimerDisplay() {
   document.getElementById('scene-timer-display').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
 }
 
+function toggleSceneContinuous() {
+  sceneContinuous = !sceneContinuous;
+  const btn = document.getElementById('scene-btn-continuous');
+  if (sceneContinuous) {
+    btn.classList.add('active');
+    requestWakeLock();
+  } else {
+    btn.classList.remove('active');
+    releaseWakeLock();
+  }
+}
+
 // ── Character Practice ────────────────────────────────────
 
 let charTimerInterval = null;
@@ -2404,6 +2441,7 @@ let charTimerEndTime = null;
 let charTimerDuration = 120;
 let charTimerRemaining = 120;
 let charTimerRunning = false;
+let charContinuous = false;
 
 function showCharacterPractice() {
   randomCharacter();
@@ -2447,7 +2485,21 @@ function startCharTimer() {
   charTimerInterval = setInterval(() => {
     charTimerRemaining = Math.max(0, Math.ceil((charTimerEndTime - Date.now()) / 1000));
     updateCharTimerDisplay();
-    if (charTimerRemaining <= 0) { stopCharTimer(); playChime(); document.getElementById('char-timer-display').classList.add('done'); }
+    if (charTimerRemaining <= 0) {
+      stopCharTimer();
+      playChime();
+      if (charContinuous) {
+        document.getElementById('char-timer-display').classList.remove('running');
+        setTimeout(() => {
+          randomCharacter();
+          charTimerRemaining = charTimerDuration;
+          updateCharTimerDisplay();
+          setTimeout(() => startCharTimer(), 600);
+        }, 1500);
+      } else {
+        document.getElementById('char-timer-display').classList.add('done');
+      }
+    }
   }, 100);
 }
 
@@ -2457,7 +2509,7 @@ function stopCharTimer() {
   const btn = document.getElementById('char-btn-start');
   btn.textContent = 'Start'; btn.classList.remove('stop'); btn.classList.add('start');
   document.getElementById('char-timer-display').classList.remove('running');
-  releaseWakeLock();
+  if (!charContinuous) releaseWakeLock();
 }
 
 function resetCharTimer() {
@@ -2471,6 +2523,18 @@ function updateCharTimerDisplay() {
   const min = Math.floor(charTimerRemaining / 60);
   const sec = charTimerRemaining % 60;
   document.getElementById('char-timer-display').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function toggleCharContinuous() {
+  charContinuous = !charContinuous;
+  const btn = document.getElementById('char-btn-continuous');
+  if (charContinuous) {
+    btn.classList.add('active');
+    requestWakeLock();
+  } else {
+    btn.classList.remove('active');
+    releaseWakeLock();
+  }
 }
 
 // ── Visibility API (fix timer drift on screen lock) ───────
