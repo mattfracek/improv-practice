@@ -3136,7 +3136,16 @@ function getDifficulty() {
 
 // Track recent picks per pool+difficulty so randomization doesn't repeat itself.
 // Keyed by `poolName|difficulty` so changing difficulty resets the taboo set.
-const recentPicks = {};
+// Persisted to localStorage so the taboo carries across sessions / PWA cold starts —
+// otherwise day 2 starts with no memory of day 1 and serves yesterday's prompts again.
+const RECENT_PICKS_KEY = 'improv-recent-picks';
+const recentPicks = (() => {
+  try { return JSON.parse(localStorage.getItem(RECENT_PICKS_KEY) || '{}'); }
+  catch { return {}; }
+})();
+function saveRecentPicks() {
+  try { localStorage.setItem(RECENT_PICKS_KEY, JSON.stringify(recentPicks)); } catch {}
+}
 
 function pickFromPool(poolName) {
   const pool = prompts[poolName];
@@ -3161,6 +3170,7 @@ function pickFromPool(poolName) {
   recent.push(text);
   if (recent.length > tabooSize + 5) recent.shift();
   recentPicks[key] = recent;
+  saveRecentPicks();
 
   return text;
 }
