@@ -635,6 +635,43 @@ body {
     </div>
   </div>
 
+  <!-- A.A.N (Adjective Adjective Noun) -->
+  <div id="view-aan" class="view">
+    <div class="header">
+      <button class="back-btn" onclick="goHome()">&#8249;</button>
+      <h1>A.A.N</h1>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="exercise-scroll" style="padding: 0 16px;">
+      <div class="exercise-purpose" style="margin-bottom:20px;">
+        <strong>Adjective. Adjective. Noun.</strong> Don't think &mdash; become it. The instant you read it, jump in: how do they stand, move, breathe, talk? Embody all three at once and let them have an opinion.
+      </div>
+      <div class="prompt-section" style="display:block">
+        <div class="prompt-label">Become This</div>
+        <div class="prompt-value" id="aan-value" style="color:var(--green);font-size:24px;line-height:1.3;"></div>
+        <button class="prompt-btn" style="background:var(--green);color:#0a0a12;" onclick="randomAAN()">New One</button>
+      </div>
+      <div class="timer-section">
+        <div class="timer-presets" id="aan-timer-presets">
+          <button class="preset-btn" onclick="setAanTimer(15)">0:15</button>
+          <button class="preset-btn selected" onclick="setAanTimer(30)">0:30</button>
+          <button class="preset-btn" onclick="setAanTimer(60)">1:00</button>
+          <button class="preset-btn" onclick="setAanTimer(120)">2:00</button>
+          <button class="preset-btn" onclick="setAanTimer(300)">5:00</button>
+        </div>
+        <div class="timer-display" id="aan-timer-display">0:30</div>
+        <div class="timer-controls">
+          <button class="timer-btn reset" onclick="resetAanTimer()">Reset</button>
+          <button class="timer-btn start" id="aan-btn-start" onclick="toggleAanTimer()">Start</button>
+        </div>
+        <button class="continuous-toggle" id="aan-btn-continuous" onclick="toggleAanContinuous()">
+          <span class="cont-icon">&#9654;&#9654;</span>
+          <span>Continuous</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- BROWSE -->
   <div id="view-browse" class="view">
     <div class="header">
@@ -3127,6 +3164,65 @@ const prompts = {
     { text: 'Two strangers sharing a hospital room', d: 'h' },
     { text: 'Parent teaching teen to drive', d: 'h' },
   ],
+
+  // ── A.A.N (Adjective Adjective Noun) ──────────────────────
+  // Curated for SNAP embodiment. Adjectives = playable states/attitudes/physicality.
+  // Nouns = people/roles you can instantly *become* (never inanimate objects).
+  aanAdjectives: [
+    { text: 'angry', d: 'e' }, { text: 'exhausted', d: 'e' }, { text: 'paranoid', d: 'e' },
+    { text: 'smug', d: 'e' }, { text: 'giddy', d: 'e' }, { text: 'nervous', d: 'e' },
+    { text: 'arrogant', d: 'e' }, { text: 'heartbroken', d: 'e' }, { text: 'suspicious', d: 'e' },
+    { text: 'overconfident', d: 'e' }, { text: 'clumsy', d: 'e' }, { text: 'ancient', d: 'e' },
+    { text: 'sweaty', d: 'e' }, { text: 'twitchy', d: 'e' }, { text: 'regal', d: 'e' },
+    { text: 'bubbly', d: 'e' }, { text: 'grumpy', d: 'e' }, { text: 'seductive', d: 'e' },
+    { text: 'terrified', d: 'e' }, { text: 'pompous', d: 'e' }, { text: 'sluggish', d: 'e' },
+    { text: 'hyper', d: 'e' }, { text: 'fragile', d: 'e' }, { text: 'menacing', d: 'e' },
+    { text: 'flirtatious', d: 'e' }, { text: 'gloomy', d: 'e' }, { text: 'jittery', d: 'e' },
+    { text: 'boastful', d: 'e' }, { text: 'weepy', d: 'e' }, { text: 'fat', d: 'e' },
+    { text: 'lanky', d: 'e' }, { text: 'tiny', d: 'e' }, { text: 'gigantic', d: 'e' },
+    { text: 'frail', d: 'e' }, { text: 'stiff', d: 'e' }, { text: 'drunk', d: 'e' },
+    { text: 'dizzy', d: 'e' }, { text: 'sleepy', d: 'e' }, { text: 'cheerful', d: 'e' },
+    { text: 'bitter', d: 'e' }, { text: 'anxious', d: 'e' }, { text: 'cocky', d: 'e' },
+    { text: 'clingy', d: 'e' }, { text: 'bored', d: 'e' }, { text: 'furious', d: 'e' },
+    { text: 'dramatic', d: 'e' }, { text: 'shy', d: 'e' }, { text: 'greedy', d: 'e' },
+    { text: 'gentle', d: 'e' }, { text: 'lazy', d: 'e' }, { text: 'frantic', d: 'e' },
+    { text: 'jolly', d: 'e' }, { text: 'melancholy', d: 'e' }, { text: 'smitten', d: 'e' },
+    { text: 'vain', d: 'e' }, { text: 'sneaky', d: 'e' }, { text: 'breathless', d: 'e' },
+    { text: 'oily', d: 'e' }, { text: 'graceful', d: 'e' }, { text: 'robotic', d: 'e' },
+    { text: 'hungover', d: 'e' }, { text: 'peppy', d: 'e' }, { text: 'brooding', d: 'e' },
+    { text: 'sunburned', d: 'e' }, { text: 'lovesick', d: 'e' }, { text: 'washed-up', d: 'e' },
+    { text: 'long-winded', d: 'e' }, { text: 'overcaffeinated', d: 'e' },
+    { text: 'perpetually late', d: 'e' }, { text: 'hard of hearing', d: 'e' },
+  ],
+
+  aanNouns: [
+    { text: 'construction worker', d: 'e' }, { text: 'cowboy', d: 'e' }, { text: 'preacher', d: 'e' },
+    { text: 'used-car salesman', d: 'e' }, { text: 'gym coach', d: 'e' }, { text: 'ballerina', d: 'e' },
+    { text: 'pro wrestler', d: 'e' }, { text: 'librarian', d: 'e' }, { text: 'surgeon', d: 'e' },
+    { text: 'drill sergeant', d: 'e' }, { text: 'grandmother', d: 'e' }, { text: 'cult leader', d: 'e' },
+    { text: 'game show host', d: 'e' }, { text: 'fisherman', d: 'e' }, { text: 'professor', d: 'e' },
+    { text: 'biker', d: 'e' }, { text: 'butler', d: 'e' }, { text: 'beauty pageant queen', d: 'e' },
+    { text: 'fortune teller', d: 'e' }, { text: 'lifeguard', d: 'e' }, { text: 'mall Santa', d: 'e' },
+    { text: 'news anchor', d: 'e' }, { text: 'farmer', d: 'e' }, { text: 'magician', d: 'e' },
+    { text: 'bartender', d: 'e' }, { text: 'monk', d: 'e' }, { text: 'detective', d: 'e' },
+    { text: 'knight', d: 'e' }, { text: 'pirate', d: 'e' }, { text: 'flight attendant', d: 'e' },
+    { text: 'politician', d: 'e' }, { text: 'chef', d: 'e' }, { text: 'dog trainer', d: 'e' },
+    { text: 'nightclub bouncer', d: 'e' }, { text: 'kindergarten teacher', d: 'e' },
+    { text: 'weatherman', d: 'e' }, { text: 'plumber', d: 'e' }, { text: 'cheerleader', d: 'e' },
+    { text: 'boxer', d: 'e' }, { text: 'nun', d: 'e' }, { text: 'tour guide', d: 'e' },
+    { text: 'security guard', d: 'e' }, { text: 'wedding DJ', d: 'e' }, { text: 'yoga instructor', d: 'e' },
+    { text: 'fast-food cashier', d: 'e' }, { text: 'opera singer', d: 'e' }, { text: 'lumberjack', d: 'e' },
+    { text: 'telemarketer', d: 'e' }, { text: 'bus driver', d: 'e' }, { text: 'dental hygienist', d: 'e' },
+    { text: 'motivational speaker', d: 'e' }, { text: 'park ranger', d: 'e' }, { text: 'barista', d: 'e' },
+    { text: 'referee', d: 'e' }, { text: 'talk show host', d: 'e' }, { text: 'mime', d: 'e' },
+    { text: 'carnival barker', d: 'e' }, { text: 'prison guard', d: 'e' }, { text: 'valet', d: 'e' },
+    { text: 'taxidermist', d: 'e' }, { text: 'substitute teacher', d: 'e' },
+    { text: 'real estate agent', d: 'e' }, { text: 'golf caddy', d: 'e' }, { text: 'exterminator', d: 'e' },
+    { text: 'wedding planner', d: 'e' }, { text: 'cruise ship captain', d: 'e' },
+    { text: 'infomercial host', d: 'e' }, { text: 'hairdresser', d: 'e' }, { text: 'sports mascot', d: 'e' },
+    { text: 'royal guard', d: 'e' }, { text: 'swim coach', d: 'e' }, { text: 'locksmith', d: 'e' },
+    { text: 'butcher', d: 'e' }, { text: 'beekeeper', d: 'e' },
+  ],
 };
 
 // ── Difficulty filtering ──────────────────────────────────
@@ -3222,9 +3318,11 @@ function goHome() {
   stopTimer();
   stopSceneTimer();
   stopCharTimer();
+  stopAanTimer();
   if (continuousMode) toggleContinuous();
   if (sceneContinuous) toggleSceneContinuous();
   if (charContinuous) toggleCharContinuous();
+  if (aanContinuous) toggleAanContinuous();
   showView('view-home');
 }
 
@@ -3519,26 +3617,38 @@ function showFavorites() {
   const list = document.getElementById('favorites-list');
   const empty = document.getElementById('favorites-empty');
   list.innerHTML = '';
+  list.style.display = 'block';
+  empty.style.display = 'none';
+
+  // Pinned game: A.A.N — always available here, opens its own generator
+  const aan = document.createElement('div');
+  aan.className = 'browse-item';
+  aan.onclick = () => showAAN();
+  aan.innerHTML =
+    '<div class="name">A.A.N</div>' +
+    '<div class="source-tag">Adjective Adjective Noun</div>' +
+    '<div class="fav-indicator" style="color:var(--green);">&#9861;</div>';
+  list.appendChild(aan);
 
   const favs = exercises.filter(ex => ex.favorite);
+  favs.forEach(ex => {
+    const item = document.createElement('div');
+    item.className = 'browse-item';
+    item.onclick = () => showExercise(ex);
+    item.innerHTML =
+      '<div class="name">' + ex.name + '</div>' +
+      '<div class="source-tag">' + ex.source.split('/')[0].trim() + '</div>' +
+      '<div class="fav-indicator">&#9733;</div>';
+    list.appendChild(item);
+  });
 
   if (favs.length === 0) {
-    list.style.display = 'none';
-    empty.style.display = 'flex';
-  } else {
-    list.style.display = 'block';
-    empty.style.display = 'none';
-
-    favs.forEach(ex => {
-      const item = document.createElement('div');
-      item.className = 'browse-item';
-      item.onclick = () => showExercise(ex);
-      item.innerHTML =
-        '<div class="name">' + ex.name + '</div>' +
-        '<div class="source-tag">' + ex.source.split('/')[0].trim() + '</div>' +
-        '<div class="fav-indicator">&#9733;</div>';
-      list.appendChild(item);
-    });
+    const hint = document.createElement('div');
+    hint.className = 'empty-hint';
+    hint.style.padding = '16px 4px';
+    hint.style.textAlign = 'center';
+    hint.textContent = 'Star any exercise to add it here too.';
+    list.appendChild(hint);
   }
 
   showView('view-favorites');
@@ -3816,6 +3926,113 @@ function toggleCharContinuous() {
   }
 }
 
+// ── A.A.N (Adjective Adjective Noun) ──────────────────────
+
+let aanTimerInterval = null;
+let aanTimerEndTime = null;
+let aanTimerDuration = 30;
+let aanTimerRemaining = 30;
+let aanTimerRunning = false;
+let aanContinuous = false;
+
+function showAAN() {
+  randomAAN();
+  aanTimerDuration = 30;
+  aanTimerRemaining = 30;
+  updateAanTimerDisplay();
+  showView('view-aan');
+}
+
+function randomAAN() {
+  const adj1 = pickFromPool('aanAdjectives');
+  let adj2 = pickFromPool('aanAdjectives');
+  let tries = 0;
+  while (adj2 === adj1 && tries < 6) { adj2 = pickFromPool('aanAdjectives'); tries++; }
+  const noun = pickFromPool('aanNouns');
+  const el = document.getElementById('aan-value');
+  el.textContent = adj1 + ', ' + adj2 + ', ' + noun;
+  el.classList.remove('prompt-pop'); void el.offsetWidth; el.classList.add('prompt-pop');
+}
+
+function setAanTimer(seconds) {
+  stopAanTimer();
+  aanTimerDuration = seconds;
+  aanTimerRemaining = seconds;
+  updateAanTimerDisplay();
+  document.querySelectorAll('#aan-timer-presets .preset-btn').forEach(b => b.classList.remove('selected'));
+  const map = { 15: 0, 30: 1, 60: 2, 120: 3, 300: 4 };
+  if (map[seconds] !== undefined) document.querySelectorAll('#aan-timer-presets .preset-btn')[map[seconds]].classList.add('selected');
+}
+
+function toggleAanTimer() {
+  if (aanTimerRunning) { stopAanTimer(); } else { startAanTimer(); }
+}
+
+function startAanTimer() {
+  if (aanTimerRemaining <= 0) aanTimerRemaining = aanTimerDuration;
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  aanTimerEndTime = Date.now() + aanTimerRemaining * 1000;
+  aanTimerRunning = true;
+  requestWakeLock();
+  const btn = document.getElementById('aan-btn-start');
+  btn.textContent = 'Stop'; btn.classList.remove('start'); btn.classList.add('stop');
+  document.getElementById('aan-timer-display').classList.add('running');
+  document.getElementById('aan-timer-display').classList.remove('done');
+  aanTimerInterval = setInterval(() => {
+    aanTimerRemaining = Math.max(0, Math.ceil((aanTimerEndTime - Date.now()) / 1000));
+    updateAanTimerDisplay();
+    if (aanTimerRemaining <= 0) {
+      stopAanTimer();
+      playChime();
+      if (aanContinuous) {
+        document.getElementById('aan-timer-display').classList.remove('running');
+        setTimeout(() => {
+          randomAAN();
+          aanTimerRemaining = aanTimerDuration;
+          updateAanTimerDisplay();
+          setTimeout(() => startAanTimer(), 600);
+        }, 1500);
+      } else {
+        document.getElementById('aan-timer-display').classList.add('done');
+      }
+    }
+  }, 100);
+}
+
+function stopAanTimer() {
+  aanTimerRunning = false;
+  if (aanTimerInterval) { clearInterval(aanTimerInterval); aanTimerInterval = null; }
+  const btn = document.getElementById('aan-btn-start');
+  btn.textContent = 'Start'; btn.classList.remove('stop'); btn.classList.add('start');
+  document.getElementById('aan-timer-display').classList.remove('running');
+  if (!aanContinuous) releaseWakeLock();
+}
+
+function resetAanTimer() {
+  stopAanTimer();
+  aanTimerRemaining = aanTimerDuration;
+  updateAanTimerDisplay();
+  document.getElementById('aan-timer-display').classList.remove('done');
+}
+
+function updateAanTimerDisplay() {
+  const min = Math.floor(aanTimerRemaining / 60);
+  const sec = aanTimerRemaining % 60;
+  document.getElementById('aan-timer-display').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function toggleAanContinuous() {
+  aanContinuous = !aanContinuous;
+  const btn = document.getElementById('aan-btn-continuous');
+  if (aanContinuous) {
+    btn.classList.add('active');
+    requestWakeLock();
+  } else {
+    btn.classList.remove('active');
+    releaseWakeLock();
+  }
+}
+
 // ── Visibility API (fix timer drift on screen lock) ───────
 
 document.addEventListener('visibilitychange', () => {
@@ -3834,6 +4051,11 @@ document.addEventListener('visibilitychange', () => {
     charTimerRemaining = Math.max(0, Math.ceil((charTimerEndTime - Date.now()) / 1000));
     updateCharTimerDisplay();
     if (charTimerRemaining <= 0) { stopCharTimer(); playChime(); document.getElementById('char-timer-display').classList.add('done'); }
+  }
+  if (aanTimerRunning && aanTimerEndTime) {
+    aanTimerRemaining = Math.max(0, Math.ceil((aanTimerEndTime - Date.now()) / 1000));
+    updateAanTimerDisplay();
+    if (aanTimerRemaining <= 0) { stopAanTimer(); playChime(); document.getElementById('aan-timer-display').classList.add('done'); }
   }
 });
 
